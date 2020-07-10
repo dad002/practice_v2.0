@@ -13,28 +13,22 @@
 <body>
 
 <div class="main">
+    <div class="space1" style="height: 110px;"></div>
     <div class="form">
-        <form>
+        <form method="POST" action="">
             <div class="form-group">
-                <label for="exampleInputEmail1">Login</label>
-                <input aria-describedby="emailHelp" name="login" class="form-control" id="exampleInputEmail1" type="text">
+                <label for="InputLogin">Login</label>
+                <input aria-describedby="emailHelp" name="login" class="form-control" id="InputLogin" type="text">
             </div>
-            <div class="form-group">
-                <label for="exampleInputPassword1">Password</label>
-                <input class="form-control" id="exampleInputPassword1" name="password" type="password">
-            </div>
-            <button class="btn btn-primary" type="submit">Submit</button>
-            <a class="non btn btn-danger" href="reg.html">Reg</a>
+            <label for="InputPassword">Password</label>
+            <input class="form-control" id="InputPassword" name="password" type="password">
+            <button type="submit" class="btn btn-primary">Login</button>  <!-- Кнопка отправляет форму -->
+            <!-- Ссылка, которая выглядит как кнопка перекидывает на reg.html -->
+            <a href="reg.html" class="btn btn-primary">Registration</a>
         </form>
     </div>
     <div class="space1"></div>
 </div>
-
-<div class="footer">
-
-</div>
-
-<!--button type="button" class="btn btn-primary" onclick="action()">Нажми плз</button!-->
 
 </body>
 </html>

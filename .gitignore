@@ -1,4 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
+
+desktop.ini
+
 ### Node template
 # Logs
 logs
@@ -116,3 +119,9 @@ dist
 .yarn/build-state.yml
 .pnp.*
 
+
+.idea/dataSources/ecf263fc-fc36-4aa4-9821-aa2227a6ff25/storage_v2/_src_/schema/
+
+.idea/dataSources/
+
+.idea/

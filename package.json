@@ -19,8 +19,10 @@
   },
   "homepage": "https://github.com/dad002/practice#readme",
   "dependencies": {
-    "sqlite3": "^5.0.0",
-    "bluebird": "^3.7.2"
+    "axios": "^0.19.2",
+    "bluebird": "^3.7.2",
+    "random-name": "^0.1.2",
+    "sqlite3": "^5.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"

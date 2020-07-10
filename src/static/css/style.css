@@ -1,9 +1,3 @@
-body {
-    text-align: center;
-    background-color: red;
-    padding-top: 5%;
-}
-
 .form {
     width: 25%;
     margin-left: 36%;
@@ -15,10 +9,6 @@ body {
     margin-left: 5%;
 }
 
-.form-group {
-    text-align: end;
-}
-
 .mr-l {
     margin-left: 83%;
 }
@@ -27,6 +17,76 @@ body {
     clear: both;
 }
 
-.non {
-    text-decoration: none;
+.space-30px {
+    height: 30px;
+}
+
+.right-bar {
+    /*border: 2px solid red;*/
+    float: right;
+    
+
+    width: 38%;
+
+    margin-right: 5%;
+
+    text-align: center;
+}
+
+.inline {
+    display: inline-block;
+}
+
+.link-gen {
+    /*border: 2px solid red;*/
+    float: right;
+
+    width: 100%;
+}
+
+.gen-field {
+    text-align: center;
+    margin-top: 10px;
+    height: 34px;
+    padding-top: 5px;
+
+    background-color: lightgrey;
+
+    border-radius: 5px;
+}
+
+.link_area {
+    background-color: lightgrey;
+    margin-top: 10px;
+    height: 80px;
+    padding: 5px 5px 5px 5px;
+    border-radius: 5px;
+}
+
+.float_left {
+    float: left;
+}
+
+.float_right {
+    float: right;
+}
+
+.red_squear {
+    border: 2px solid red;
+}
+
+.m-b10px {
+    margin-bottom: 10px;
+}
+
+.w-100p {
+    width: 100%;
+}
+
+.h-80px {
+    height: 80px;
+}
+
+.ml-5p {
+    margin-left: 5%;
 }
