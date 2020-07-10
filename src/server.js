@@ -204,12 +204,12 @@ const server = http.createServer(async (req, res) => {
                 break;
             }
 
-            const groups_table = await database.getGroupsByTeacher(cookies.login)
-            res.writeHead(200, {'Content-Type': 'text/json'})
+            const groups_table = await database.getGroupsByTeacher(cookies.login);
+            res.writeHead(200, {'Content-Type': 'text/json'});
 
             res.end(JSON.stringify(groups_table))
 
-            break
+            break;
 
         case '/link_midl.html':
             if (cookies.id !== undefined) {

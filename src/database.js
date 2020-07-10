@@ -155,13 +155,13 @@ async function getLinkByHash() {
     return "https://google.com"
 }
 
-function getGroupsByTeacher(teacherID) {
+function getGroupsByTeacher(login) {
     return new Promise((resolve, reject) => {
 
-        let sql = 'SELECT Number FROM Class WHERE Class.TeacherID = (?)';
+        let sql = 'SELECT Class.Number FROM Class JOIN Teacher ON Teacher.ID = Class.TeacherID WHERE Teacher.Login = (?)';
         let res = [];
 
-        db.all(sql, [teacherID], (err, rows) => {
+        db.all(sql, [login], (err, rows) => {
            if (err) {
                console.log(err.message);
                resolve(res);
@@ -356,6 +356,10 @@ function getTeacherByLinkHash(hashLink) {
     });
 }
 
+
+getGroupsByTeacher("test").then(res => {
+    console.log(res)
+})
 // Для того, чтобы можно было сделать require
 module.exports = {
     db,
