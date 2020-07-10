@@ -5,7 +5,7 @@ let db = new sqlite.Database('data.db');
 
 // Функция просто для тестирования
 function get() {
-    let sql = "SELECT * FROM Teacher"
+    let sql = "SELECT * FROM Teacher";
 
     db.all(sql, [], (err, rows) => {
         if (err) {
@@ -55,13 +55,13 @@ function addTeacher(login, password) {
 }
 
 // Добавление класса учителем
-function addClass(teacherID, classNumber) {
+function addClass(classNumber, teacherID) {
 
     return new Promise((resolve, reject) => {
 
         let res = false;
 
-        db.run('INSERT INTO Class(Number, TeacherID) VALUES (?, ?)', [classNumber, teacherID], function (err) {
+        db.run('INSERT INTO Class(Number, TeacherID) VALUES (?, ?)', [classNumber, teacherID], (err) => {
             if (err) {
                 console.log(err.message);
                 resolve(res);
@@ -113,5 +113,8 @@ function register(login, password) {
 
 register('andrey', 'asdf').then(res => {
     console.log(res)
+});
+addClass("M3205",4).then(res => {
+   console.log(res)
 });
 

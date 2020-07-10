@@ -23,7 +23,7 @@ function parseCookies(request) {
 
 const server = http.createServer((req, res) => {
     // свойства объекта req
-    console.log(`${req.method} ${req.url}`);
+    //console.log(`${req.method} ${req.url}`);
     // console.log(req.headers);
 
     const cookies = parseCookies(req);
@@ -32,8 +32,11 @@ const server = http.createServer((req, res) => {
 
     switch (urlObject.pathname) {
         case '/':  // Экран входа
+
+            console.log(req.method);
             if (req.method === "POST") {
                 // TODO: Обработать, существует ли пользователь
+
                 let login, password; // TODO
                 res.writeHead(200, {
                     'Set-Cookie': `login=${login};password=${password}`,
@@ -77,13 +80,13 @@ const server = http.createServer((req, res) => {
                         res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
                         res.end(html_reg);
                     }
-                })
+                });
 
                 break;
             }
             res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
-            res.end(html_reg)
-            break
+            res.end(html_reg);
+            break;
         case '/main.html':
             // TODO: Проверить, правильные ли логин и пароль
             const login = cookies.login;
@@ -99,6 +102,7 @@ const server = http.createServer((req, res) => {
 
 }).listen(5000, () => console.log(`Сервер запущен: http://` +
     `${server.address().address === "::" ? "localhost" : server.address().address}:${server.address().port}`
-))
+));
 // запуск веб-сервера
+
 
