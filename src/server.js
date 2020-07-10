@@ -1,11 +1,10 @@
-const http = require('http');
-// модуль для запуска веб-сервера
-const fs = require('fs');
-// модуль для работы с файлами
-const url = require('url') // Для обработки URL
+const http = require('http'); // модуль для запуска веб-сервера
+const fs = require('fs'); // модуль для работы с файлами
+const url = require('url'); // Для обработки URL
 
 const html_log = fs.readFileSync('src/static/index.html')
 const html_reg = fs.readFileSync('src/static/reg.html')
+const html_main = fs.readFileSync('src/static/main.html')
 const css = fs.readFileSync('src/static/css/style.css')
 const js = fs.readFileSync('src/static/js/action.js')
 
@@ -52,13 +51,13 @@ const server = http.createServer((req, res) => {
             break
         case '/action.js':
             res.writeHead(200, {'Content-Type': 'text/javascript'}); // plain - в случае обычного текста
-            res.end(js);
+            res.end(js)
             break
         case '/reg.html':  // Экран регистрации
             if (req.method === "POST") {
                 let postData = "";
 
-                req.on("data", chunk => postData += chunk);
+                req.on("data", chunk => postData += chunk)
 
                 req.on("end", () => {
                     var postDataObject = JSON.parse(postData)
@@ -91,7 +90,7 @@ const server = http.createServer((req, res) => {
             const password = cookies.password;
 
             res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
-            res.end(html_reg)
+            res.end(html_main)
             break
         default:
             res.writeHead(200, {'Content-Type': 'text/plain'});
