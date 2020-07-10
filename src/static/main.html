@@ -36,7 +36,7 @@
 
 		<div class="login">LOGIN</div>
 	</nav>
-
+	<div class="space-30px"></div>
 	<div class="my_table">
 		<table class="table">
 		  	<thead>
@@ -70,21 +70,57 @@
 		</table>
 	</div>
 
-	<div class="right-bar">
-		<a href="#" class="btn btn-info inline w-100p" style="margin-bottom: 10px">Statistic</a><br>
-<!--		<a href="#" class="btn btn-info inline w-100p">Group</a><br>-->
-	</div>
+	
 
-	<div class="link-gen" style="height: 128px;">
-		<input class="form-control m-b10px" type="text" placeholder="Link here..." id="link_input">
-		<button type="button" class="btn btn-warning w-100p h-80px" onclick="create_link()">Gen Link</button>
-		<input id="link" class="link_area" readonly placeholder="Здесь будет ссылка" />
+	<div class="right-bar">
+		<div class="float_right">
+			<div class="link-gen" style="height: 185px;">
+				<input class="form-control m-b10px" type="text" placeholder="Link here..." id="link_input">
+				<input id="link" class="form-control w-100p m-b10px" placeholder="Здесь будет ссылка" />
+				<button type="button" class="btn btn-warning w-100p h-80px" onclick="create_link()">Gen Link</button>
+			</div>	
+			<a href="#" class="btn btn-info inline w-100p" style="margin-bottom: 10px">Statistic</a><br>
+		</div>
+		<div class="float_left">
+			<div class="my_table">
+				<table class="table">
+				  	<thead>
+				    	<tr>
+				      		<th scope="col" id="gr_num">#</th>
+				      		<th scope="col">Name</th>
+				      		<th scope="col">Surname</th>
+				      		<th scope="col">Zoom</th>
+				    	</tr>
+				  	</thead>
+				  	<tbody id="tbody">
+				    	<tr>
+				      		<th scope="row">1</th>
+				      		<td>Mark</td>
+				      		<td>Otto</td>
+				      		<td>@mdo</td>
+					    </tr>
+					    <tr>
+				    		<th scope="row">2</th>
+				      		<td>Jacob</td>
+				      		<td>Thornton</td>
+				      		<td>@fat</td>
+				    	</tr>
+				    	<tr>
+				      		<th scope="row">3</th>
+				      		<td>Larry</td>
+				      		<td>the Bird</td>
+				      		<td>@twitter</td>
+				    	</tr>
+				  	</tbody>
+				</table>
+			</div>
+		</div>
+
 	</div>
 
 	<div class="footer">
 		<div class="space1"></div>
-<!--		<button type="button" class="btn btn-info ml-5p" onclick="refresh_gr()">Add</button>-->
-		<button type="button" class="btn btn-success" onclick="refresh()">Refresh</button>
+		<button type="button" class="btn btn-success ml-5p" onclick="refresh()">Refresh</button>
 	</div>
 
 </body>
