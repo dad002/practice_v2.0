@@ -31,10 +31,10 @@ function refresh_gr() {
 			  element.classList.add("dropdown-item");
 			  element.href = "#";
 			  element.onclick = () => {
-			    window.currentGroup = el;
+			    window.currentGroup = el.Number;
 			    refresh();
 			  }
-			  element.innerText = `Группа ${el}`
+			  element.innerText = `Группа ${el.Number}`
 			  dropdownMenu.append(element);
 			})
 			resolve()
