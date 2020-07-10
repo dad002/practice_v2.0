@@ -5,7 +5,7 @@ let db = new sqlite.Database('data.db');
 
 // Функция просто для тестирования
 function get() {
-    let sql = "SELECT * FROM Teacher"
+    let sql = "SELECT * FROM Teacher";
 
     db.all(sql, [], (err, rows) => {
         if (err) {
@@ -16,19 +16,20 @@ function get() {
         });
     });
 }
+
 // Проверка наличия учителя с подобным логином (true - если нет, false - если есть)
 function checkTeacher(login) {
     let sql = "SELECT Login From Teacher Where Login = (?)";
 
-    return new Promise ((resolve, reject) => {
-        db.all(sql, [login], (err,row) => {
+    return new Promise((resolve, reject) => {
+        db.all(sql, [login], (err, row) => {
             let res = false;
 
             if (err) {
                 reject(err);
             }
 
-            if (row.length === 0){
+            if (row.length === 0) {
                 res = true;
             }
 
@@ -40,7 +41,7 @@ function checkTeacher(login) {
 
 // Добавление учителя в базу данных (true - если удалось добавить, false - если нет)
 function addTeacher(login, password) {
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         let res = false;
 
         db.run('INSERT INTO Teacher(Login, Password) VALUES (?, ?)', [login, password], function (err) {
@@ -55,13 +56,13 @@ function addTeacher(login, password) {
 }
 
 // Добавление класса учителем
-function addClass(teacherID, classNumber) {
+function addClass(classNumber, teacherID) {
 
     return new Promise((resolve, reject) => {
 
         let res = false;
 
-        db.run('INSERT INTO Class(Number, TeacherID) VALUES (?, ?)', [classNumber, teacherID], function (err) {
+        db.run('INSERT INTO Class(Number, TeacherID) VALUES (?, ?)', [classNumber, teacherID], (err) => {
             if (err) {
                 console.log(err.message);
                 resolve(res);
@@ -72,9 +73,10 @@ function addClass(teacherID, classNumber) {
         });
     });
 }
+
 // login (0 - если ошибка или не совпадает логин или пароль, 1 - если успешно, 2 - если такой пользователь уже есть)
 function login(Login, Password) {
-    return new Promise ((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         db.all('SELECT Login, Password FROM Teacher WHERE Login = (?) and Password = (?)', [Login, Password], (err, row) => {
             let res = 0;
             if (err) {
@@ -89,29 +91,32 @@ function login(Login, Password) {
             }
 
             resolve(res)
-
         });
     })
 }
+
 // register (true - если успешно, false - если неуспешно)
-function register(login, password) {
+async function register(login, password) {
+    let regRes = false;
 
-    return new Promise((resolve, reject) => {
-        let regRes = false;
-
-        checkTeacher(login).then(res => {
-            regRes = res;
-        });
-
-        if (regRes === false) {
-            addTeacher(login, password);
-        }
-
-        resolve(regRes)
+    checkTeacher(login).then(res => {
+        regRes = res;
     });
+
+    if (regRes === false) {
+        regRes = await addTeacher(login, password);
+    }
+
+    return regRes;
 }
 
-register('andrey', 'asdf').then(res => {
-    console.log(res)
-});
-
+// Для того, чтобы можно было сделать require
+module.exports = {
+    db,
+    get,
+    checkTeacher,
+    addTeacher,
+    addClass,
+    login,
+    register
+};
