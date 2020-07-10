@@ -110,7 +110,7 @@ async function register(login, password) {
     return regRes;
 }
 
-<<<<<<< Updated upstream
+
 // Для того, чтобы можно было сделать require
 module.exports = {
     db,
@@ -121,7 +121,7 @@ module.exports = {
     login,
     register
 };
-=======
+
 function addLesson(groupID, teacherID, date) {
     return new Promise((resolve, reject) => {
 
@@ -146,4 +146,3 @@ function getStudentsByGroup(Number) {
     });
 
 }
->>>>>>> Stashed changes

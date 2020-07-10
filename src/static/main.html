@@ -15,7 +15,7 @@
 <body>
 	<div class="space1" style="height: 30px;"></div>
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
-	  
+
 	  	<div class="collapse navbar-collapse" id="navbarSupportedContent">
 		    <ul class="navbar-nav mr-auto">
 	      		<li class="nav-item dropdown">
@@ -68,7 +68,7 @@
 		  	</tbody>
 		</table>
 	</div>
-	
+
 	<div class="right-bar">
 		<a href="#" class="btn btn-info inline w-100p" style="margin-bottom: 10px">Settings</a><br>
 		<a href="#" class="btn btn-info inline w-100p" style="margin-bottom: 10px">Statistic</a><br>
@@ -78,7 +78,33 @@
 	<div class="link-gen" style="height: 128px;">
 		<input class="form-control m-b10px" type="text" placeholder="Readonly input here..." readonly>
 		<button type="button" class="btn btn-warning w-100p h-80px">Gen Link</button>
+		<button type="button" id="postTestBtn">TEST POST</button>  <!-- ТЕСТ -->
 	</div>
+
+	<!-- ТЕСТ -->
+	<script>
+		let data = {
+			a: 'b',
+			c: 'd',
+			e: 1.7456
+		}
+
+		document.getElementById("postTestBtn").onclick = () => {
+			fetch('/testPOST', {
+				method: "POST",
+				body: JSON.stringify(data)
+			})
+			.then(response => {
+				return response.json() // Это Promise
+			})
+			.then(json => {
+				console.debug(json)
+			})
+
+			// Если мы знаем, что в ответ придёт JSON - вместо .text() используем .json() и на
+			// входе в следующий then получим распарсенный JSON объект
+		}
+	</script>
 
 </body>
 </html>
