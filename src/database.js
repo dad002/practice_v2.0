@@ -110,6 +110,7 @@ async function register(login, password) {
     return regRes;
 }
 
+<<<<<<< Updated upstream
 // Для того, чтобы можно было сделать require
 module.exports = {
     db,
@@ -120,3 +121,29 @@ module.exports = {
     login,
     register
 };
+=======
+function addLesson(groupID, teacherID, date) {
+    return new Promise((resolve, reject) => {
+
+        let sql = 'INSERT INTO Lesson(groupID, teacherID, date) VALUES (?, ?, ?)';
+        let res = false;
+
+        db.run(sql, [groupID, teacherID, date], (err) => {
+            if (err) {
+                console.log(err.message);
+                resolve(res)
+            }
+
+            res = true;
+            resolve(res);
+        });
+    });
+}
+
+function getStudentsByGroup(Number) {
+    return new Promise((resolve, reject) => {
+        sql = "SELECT Name, Surname, Zoom "
+    });
+
+}
+>>>>>>> Stashed changes
