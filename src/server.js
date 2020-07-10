@@ -8,6 +8,7 @@ const database = require('./database');  // Импортируем нашу БД
 
 var crypto = require('crypto');
 
+var port = process.env.PORT || 5000;
 
 const html_log = fs.readFileSync('src/static/index.html')
 const html_reg = fs.readFileSync('src/static/reg.html')
@@ -329,7 +330,7 @@ const server = http.createServer(async (req, res) => {
             res.end("<h1>Error 404: NOT FOUND</h1>")
     }
 
-}).listen(5000, () => console.log(`Сервер запущен: http://` +
+}).listen(port, () => console.log(`Сервер запущен: http://` +
     `${server.address().address === "::" ? "localhost" : server.address().address}:${server.address().port}`
 ));
 // запуск веб-сервера
