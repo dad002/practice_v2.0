@@ -138,8 +138,8 @@ function getStudentsByGroup(number) {
         let res = [];
         db.all(sql, [number], (err, rows) => {
             if (err) {
-                console.log(err.message)
-                resolve(res)
+                console.log(err.message);
+                resolve(res);
             }
 
             rows.forEach(row => {
@@ -239,9 +239,119 @@ function getGroupByTeacher(login) {
     });
 }
 
-addStudent('Andr', 'Alex', 'asdf','M3205').then(res => {
-    console.log(res);
-});
+function checkLink(hashLink) {
+    return new Promise(resolve => {
+        let sql = "SELECT * FROM ZoomLinks WHERE HashLink = (?)";
+        let res = false;
+
+        db.all(sql, [hashLink], (err, row) => {
+            if (err) {
+                console.log(err.message);
+                resolve(res);
+            }
+
+            if (row.length !== 0){
+                res = true;
+            }
+            resolve(res);
+        });
+    })
+}
+
+function setLink(hashLink, realLink, group, teacherLogin) {
+    return new Promise(resolve => {
+        checkLink(hashLink).then(checked => {
+            if(checked === true) {
+                let sql = "UPDATE ZoomLinks SET Link = (?) WHERE HashLink = (?)";
+
+                let res = false;
+
+                db.run(sql, [realLink, hashLink], (err) => {
+                    if (err) {
+                        console.log(err.message);
+                        resolve(res);
+                    }
+
+                    res = true;
+                    resolve(res);
+                });
+            } else {
+                let sql = 'INSERT INTO ZoomLinks ("HashLink", "Link", "Group", "Teacher") VALUES (?, ?, ?, ?)';
+
+                let res = false;
+
+                db.run(sql, [hashLink, realLink, group, teacherLogin], (err) => {
+                    if (err) {
+                        console.log(err.message);
+                        resolve(res);
+                    }
+
+                    res = true;
+                    resolve(res);
+                });
+            }
+
+
+        });
+    });
+}
+
+function getLinkByHash(hashLink) {
+    return new Promise ( resolve => {
+       let sql = "SELECT Link FROM ZoomLinks WHERE HashLink = (?)";
+
+       let res = "";
+
+       db.get(sql, [hashLink], (err, row) => {
+            if (err) {
+                console.log(err);
+                resolve(res)
+            }
+
+            res = row.Link;
+            resolve(res)
+       });
+
+    });
+}
+
+function getGroupByLinkHash(hashLink) {
+    return new Promise ( resolve => {
+        let sql = "SELECT Group FROM ZoomLinks WHERE HashLink = (?)";
+
+        let res = "";
+
+        db.get(sql, [hashLink], (err, row) => {
+            if (err) {
+                console.log(err);
+                resolve(res)
+            }
+
+            res = row.Link;
+            resolve(res)
+        });
+
+    });
+}
+
+function getTeacherByLinkHash(hashLink) {
+    return new Promise ( resolve => {
+        let sql = "SELECT Teacher FROM ZoomLinks WHERE HashLink = (?)";
+
+        let res = "";
+
+        db.get(sql, [hashLink], (err, row) => {
+            if (err) {
+                console.log(err);
+                resolve(res)
+            }
+
+            res = row.Link;
+            resolve(res)
+        });
+
+    });
+}
 
 // Для того, чтобы можно было сделать require
 module.exports = {
@@ -251,6 +361,10 @@ module.exports = {
     addClass,
     addLesson,
     getStudentsByGroup,
-    getGroupsByTeacher
+    getGroupsByTeacher,
+    setLink,
+    getLinkByHash,
+    getGroupByLinkHash,
+    getTeacherByLinkHash
 };
 
