@@ -1,0 +1,28 @@
+{
+  "name": "practice",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Practice",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "npx nodemon --inspect --watch src src/server.js",
+    "start1": "npx nodemon --inspect --watch src src/database.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dad002/practice.git"
+  },
+  "author": "Артемий Рябов",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dad002/practice/issues"
+  },
+  "homepage": "https://github.com/dad002/practice#readme",
+  "dependencies": {
+    "sqlite3": "^5.0.0",
+    "bluebird": "^3.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}

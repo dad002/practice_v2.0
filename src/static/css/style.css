@@ -1,0 +1,32 @@
+body {
+    text-align: center;
+    background-color: red;
+    padding-top: 5%;
+}
+
+.form {
+    width: 25%;
+    margin-left: 36%;
+}
+
+.my_table {
+    float: left;
+    width: 50%;
+    margin-left: 5%;
+}
+
+.form-group {
+    text-align: end;
+}
+
+.mr-l {
+    margin-left: 83%;
+}
+
+.space1 {
+    clear: both;
+}
+
+.non {
+    text-decoration: none;
+}
