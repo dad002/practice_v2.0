@@ -10,7 +10,7 @@
 <body>
     <div class="form">
         <div class="space1" style="height: 110px;"></div>
-        <form method="post">
+        <form method="post" action="">  <!-- POST запрос на тот же адрес -->
             <div class="form-group">
                 <label for="exampleInputEmail1">Login</label>
                 <input aria-describedby="emailHelp" class="form-control" id="exampleInputEmail1" name="login" type="text">
@@ -19,7 +19,7 @@
                 <label for="exampleInputPassword1">Password</label>
                 <input class="form-control" id="exampleInputPassword1" name="password" type="password">
             </div>
-            <a href="main.html" class="btn btn-primary">Login</a>
+            <button type="submit" class="btn btn-primary">Register</button>  <!-- Кнопка отправляет форму -->
         </form>
     </div>
 </body>
