@@ -173,11 +173,75 @@ function getGroupsByTeacher(teacherID) {
     });
 }
 
-function addStudent(name, surname, zoom, groupNumber) {
+function getGroupIDbyNumber(number) {
     return new Promise((resolve, reject) => {
-        sql = "INSERT INTO Student (Name, Surname, Zoom, GroupID) VALUES (?, ?, ?, ?)"
+        let sql = "SELECT ID FROM Class WHERE Number = (?)";
+
+        db.get(sql, [number], (err, row) => {
+            if (err) {
+                console.log(err.message);
+                resolve(0)
+            }
+
+            resolve(row.ID);
+        });
+
+
     });
 }
+
+function addStudent(name, surname, zoom, groupNumber) {
+    return new Promise((resolve, reject) => {
+        let check = false;
+        let gRes = 0;
+
+        getGroupIDbyNumber(groupNumber).then(res => {
+            if (res > 0) {
+                check = true;
+                gRes = res;
+            }
+            if (check === true) {
+                let sql = "INSERT INTO Student (Name, Surname, Zoom, GroupID) VALUES (?, ?, ?, ?)";
+                let res = false;
+
+                db.run(sql, [name, surname, zoom, gRes], (err) => {
+                    if (err) {
+                        console.log(err.message);
+                        resolve(res);
+                    }
+
+                    res = true;
+                    resolve(res);
+                });
+            }
+        });
+    });
+}
+
+function getGroupByTeacher(login) {
+    return new Promise ((resolve, reject) => {
+        let sql = "SELECT Number FROM Class WHERE TeacherID = (?)";
+        let res = [];
+
+        db.all(sql, [login], (err, rows) => {
+
+            if (err) {
+                console.log(err.message);
+                resolve(res)
+            }
+
+            rows.forEach(row => {
+               res.push(row);
+            });
+
+            resolve(res);
+        });
+    });
+}
+
+addStudent('Andr', 'Alex', 'asdf','M3205').then(res => {
+    console.log(res);
+});
 
 // Для того, чтобы можно было сделать require
 module.exports = {
