@@ -78,8 +78,15 @@
 				<input class="form-control m-b10px" type="text" placeholder="Link here..." id="link_input">
 				<input id="link" class="form-control w-100p m-b10px" placeholder="Здесь будет ссылка" />
 				<button type="button" class="btn btn-warning w-100p h-80px" onclick="create_link()">Gen Link</button>
-			</div>	
-			<a href="#" class="btn btn-info inline w-100p" style="margin-bottom: 10px">Statistic</a><br>
+			</div>
+			<div class="custom-control custom-radio">
+			  <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input">
+			  <label class="custom-control-label" for="customRadio1">Students</label>
+			</div>
+			<div class="custom-control custom-radio">
+			  <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input">
+			  <label class="custom-control-label" for="customRadio2">Groups</label>
+			</div>
 		</div>
 		<div class="float_left">
 			<div class="my_table">
@@ -87,28 +94,24 @@
 				  	<thead>
 				    	<tr>
 				      		<th scope="col" id="gr_num">#</th>
-				      		<th scope="col">Name</th>
-				      		<th scope="col">Surname</th>
-				      		<th scope="col">Zoom</th>
+				      		<th scope="col">Name/Surname</th>
+				      		<th scope="col">Statistic</th>
 				    	</tr>
 				  	</thead>
-				  	<tbody id="tbody">
+				  	<tbody id="tbody_stat">
 				    	<tr>
 				      		<th scope="row">1</th>
 				      		<td>Mark</td>
-				      		<td>Otto</td>
 				      		<td>@mdo</td>
 					    </tr>
 					    <tr>
 				    		<th scope="row">2</th>
 				      		<td>Jacob</td>
-				      		<td>Thornton</td>
 				      		<td>@fat</td>
 				    	</tr>
 				    	<tr>
 				      		<th scope="row">3</th>
 				      		<td>Larry</td>
-				      		<td>the Bird</td>
 				      		<td>@twitter</td>
 				    	</tr>
 				  	</tbody>

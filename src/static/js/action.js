@@ -31,10 +31,10 @@ function refresh_gr() {
 			  element.classList.add("dropdown-item");
 			  element.href = "#";
 			  element.onclick = () => {
-			    window.currentGroup = el.Number;
+			    window.currentGroup = el;
 			    refresh();
 			  }
-			  element.innerText = `Группа ${el.Number}`
+			  element.innerText = `Группа ${el}`
 			  dropdownMenu.append(element);
 			})
 			resolve()
@@ -44,7 +44,7 @@ function refresh_gr() {
 
 
 function refresh() {
-	fetch(`/table_GET?group_num=${window.currentGroup}`, {method: 'GET', credentials: 'include'})
+	fetch(`/table_st_GET?group_num=${window.currentGroup}`, {method: 'GET', credentials: 'include'})
 	.then(response => response.json())
 	.then(json => {
 		const tbody = document.getElementById('tbody')
@@ -58,6 +58,43 @@ function refresh() {
 		      		<td>${el.Name}</td>
 		      		<td>${el.Surname}</td>
 		      		<td>${el.Zoom}</td>
+			    </tr>
+			`
+		})
+	})
+}
+
+function statsStudents() {
+	fetch(`/statsStudents?group_num=${window.currentGroup.Number}`, {method: 'GET', credentials: 'include'})
+	.then(response => response.json())
+	.then(json => {
+		const tbody = document.getElementById('tbody_stat')
+		const group_num = document.getElementById('gr_num')
+		tbody.innerHTML = ``
+		group_num.innerHTML = `№${window.currentGroup}`
+		json.forEach((el, idx) => {
+			tbody.innerHTML += `
+				<tr>
+		      		<th scope="row">${idx + 1}</th>
+		      		<td>${el.Name}</td>
+		      		<td>${el.Attends}</td>
+			    </tr>
+			`
+		})
+	})
+}
+
+function statsGroups() {
+	fetch(`/statsGroups`, {method: 'GET', credentials: 'include'})
+	.then(response => response.json())
+	.then(json => {
+		const tbody = document.getElementById('tbody_stat')
+		json.forEach((el, idx) => {
+			tbody.innerHTML += `
+				<tr>
+		      		<th scope="row">${idx + 1}</th>
+		      		<td>${el.GroupID}</td>
+		      		<td>${el.Attends}</td>
 			    </tr>
 			`
 		})

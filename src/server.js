@@ -8,6 +8,7 @@ const database = require('./database');  // Импортируем нашу БД
 
 var crypto = require('crypto');
 
+var port = process.env.PORT || 5000;
 
 const html_log = fs.readFileSync('src/static/index.html')
 const html_reg = fs.readFileSync('src/static/reg.html')
@@ -324,12 +325,68 @@ const server = http.createServer(async (req, res) => {
 
             break
 
+        case '/statsGroup':
+            // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
+            if (2 !== await database.login(cookies.login, cookies.password)) {
+                res.writeHead(200, {'Location': '/', 'Content-Type': 'text/html'});
+                res.end("<script>location.href = \"/\"</script>") // На всякий случай переадресация через JS
+                break;
+            }
+
+            const groupStats = [];
+            const groups = await database.getGroupsByTeacher(cookies.login);
+
+            for (let i = 0; i < groups.length; i++) {
+                const group = groups[i].ID;
+                const attendance = (await database.getGroupAttendance(group))[0].Attendance
+                groupStats.push({
+                    GroupID: groups[i].Number,
+                    Attendance: (attendance === null ? 0 : attendance) + "%"
+                })
+            }
+
+            console.log(groupStats)
+            res.writeHead(200, {'Content-Type': 'text/json'});
+            res.end(JSON.stringify(groupStats))
+
+            break
+
+        case '/statsStudents':
+            // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
+            // if (2 !== await database.login(cookies.login, cookies.password)) {
+            //     res.writeHead(200, {'Location': '/', 'Content-Type': 'text/html'});
+            //     res.end("<script>location.href = \"/\"</script>") // На всякий случай переадресация через JS
+            //     break;
+            // }
+
+
+            const group = await database.getGroupIDbyNumber(urlObject.query.group_num);
+
+            const studentStats = [];
+            let students = await database.getStudentsByGroup(urlObject.query.group_num);
+
+            console.log(students)
+
+            for (let i = 0; i < students.length; i++) {
+                let student = students[i]
+                let attendance = (await database.getStudentsAttendance(student.ID))[0].Attendance;
+                studentStats.push({
+                    Name: `${student.Name} ${student.Surname}`,
+                    Attendance: (attendance === null ? 0 : attendance) + '%'
+                })
+            }
+
+            res.writeHead(200, {'Content-Type': 'text/json'});
+            res.end(JSON.stringify(studentStats))
+
+            break
+
         default:
             res.writeHead(200, {'Content-Type': 'text/plain'});
             res.end("<h1>Error 404: NOT FOUND</h1>")
     }
 
-}).listen(5000, () => console.log(`Сервер запущен: http://` +
+}).listen(port, () => console.log(`Сервер запущен: http://` +
     `${server.address().address === "::" ? "localhost" : server.address().address}:${server.address().port}`
 ));
 // запуск веб-сервера
