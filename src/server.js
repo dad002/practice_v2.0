@@ -146,6 +146,25 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
             res.end(html_main)
             break
+        case '/testPOST':
+            if (req.method !== 'POST') // Если не пост, шлём нахуй
+                break;
+            // Получаем данные POST запроса
+
+            let postData = "";
+
+            req.on("data", chunk => postData += chunk)
+
+            req.on('end', async () => {
+                let data = JSON.parse(postData);
+
+                data.one = 'two'
+
+                res.writeHead(200, { 'Content-Type': 'text/json' })
+                res.end(JSON.stringify(data))
+            })
+
+            break
         default:
             res.writeHead(200, {'Content-Type': 'text/plain'});
             res.end("<h1>Error 404: NOT FOUND</h1>")
