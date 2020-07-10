@@ -44,7 +44,7 @@ function addTeacher(login, password) {
     return new Promise((resolve, reject) => {
         let res = false;
 
-        db.run('INSERT INTO Teacher(Login, Password) VALUES (?, ?)', [login, password], function (err) {
+        db.run('INSERT INTO Teacher(Login, Password) VALUES (?, ?)', [login, password], function(err) {
             if (err) {
                 console.log(err.message);
                 resolve(res)
@@ -110,18 +110,6 @@ async function register(login, password) {
     return regRes;
 }
 
-
-// Для того, чтобы можно было сделать require
-module.exports = {
-    db,
-    get,
-    checkTeacher,
-    addTeacher,
-    addClass,
-    login,
-    register
-};
-
 function addLesson(groupID, teacherID, date) {
     return new Promise((resolve, reject) => {
 
@@ -140,9 +128,63 @@ function addLesson(groupID, teacherID, date) {
     });
 }
 
+function getGroupsByTeacher(login) {
+    return new Promise((resolve, reject) => {
+        resolve([1, 2, 3, 5])
+    })
+}
+
 function getStudentsByGroup(Number) {
     return new Promise((resolve, reject) => {
         sql = "SELECT Name, Surname, Zoom "
+        resolve([{
+            Name: "A",
+            Surname: "B",
+            Zoom: "@C"
+        }, {
+            Name: "A",
+            Surname: "B",
+            Zoom: "@C"
+        }, {
+            Name: "A",
+            Surname: "B",
+            Zoom: "@C"
+        }, {
+            Name: "A",
+            Surname: "B",
+            Zoom: "@C"
+        }, {
+            Name: "A",
+            Surname: "B",
+            Zoom: "@C"
+        }])
     });
-
 }
+
+async function getLinkByHash() {
+    return "https://google.com"
+}
+
+// Для того, чтобы можно было сделать require
+module.exports = {
+    db,
+    get,
+    checkTeacher,
+    addTeacher,
+    addClass,
+    login,
+    register,
+    getStudentsByGroup,
+    addLesson,
+    getGroupsByTeacher,
+    getLinkByHash,
+    checkIn() {
+
+    },
+    async getGroupByLinkHash() {
+        return Math.ceil(Math.random() * 15)
+    },
+    async addStudent() {
+
+    }
+};

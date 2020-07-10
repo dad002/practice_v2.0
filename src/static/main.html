@@ -11,6 +11,8 @@
 	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+	<script src="action.js"></script>
 </head>
 <body>
 	<div class="space1" style="height: 30px;"></div>
@@ -23,7 +25,7 @@
 	          			Groupse
 	        		</a>
 	        		<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-	          			<a class="dropdown-item" href="#">Action</a>
+	          			<a class="dropdown-item" href="#" data-abc="Group1">Action</a>
 	          			<a class="dropdown-item" href="#">Another action</a>
 	          			<div class="dropdown-divider"></div>
 	          			<a class="dropdown-item" href="#">Something else here</a>
@@ -33,20 +35,19 @@
 	  	</div>
 
 		<div class="login">LOGIN</div>
-
 	</nav>
 
 	<div class="my_table">
 		<table class="table">
 		  	<thead>
 		    	<tr>
-		      		<th scope="col">#</th>
-		      		<th scope="col">First</th>
-		      		<th scope="col">Last</th>
-		      		<th scope="col">Handle</th>
+		      		<th scope="col" id="gr_num">#</th>
+		      		<th scope="col">Name</th>
+		      		<th scope="col">Surname</th>
+		      		<th scope="col">Zoom</th>
 		    	</tr>
 		  	</thead>
-		  	<tbody>
+		  	<tbody id="tbody">
 		    	<tr>
 		      		<th scope="row">1</th>
 		      		<td>Mark</td>
@@ -70,41 +71,21 @@
 	</div>
 
 	<div class="right-bar">
-		<a href="#" class="btn btn-info inline w-100p" style="margin-bottom: 10px">Settings</a><br>
 		<a href="#" class="btn btn-info inline w-100p" style="margin-bottom: 10px">Statistic</a><br>
-		<a href="#" class="btn btn-info inline w-100p">Group</a><br>
+<!--		<a href="#" class="btn btn-info inline w-100p">Group</a><br>-->
 	</div>
 
 	<div class="link-gen" style="height: 128px;">
-		<input class="form-control m-b10px" type="text" placeholder="Readonly input here..." readonly>
-		<button type="button" class="btn btn-warning w-100p h-80px">Gen Link</button>
-		<button type="button" id="postTestBtn">TEST POST</button>  <!-- ТЕСТ -->
+		<input class="form-control m-b10px" type="text" placeholder="Link here..." id="link_input">
+		<button type="button" class="btn btn-warning w-100p h-80px" onclick="create_link()">Gen Link</button>
+		<input id="link" class="link_area" readonly placeholder="Здесь будет ссылка" />
 	</div>
 
-	<!-- ТЕСТ -->
-	<script>
-		let data = {
-			a: 'b',
-			c: 'd',
-			e: 1.7456
-		}
-
-		document.getElementById("postTestBtn").onclick = () => {
-			fetch('/testPOST', {
-				method: "POST",
-				body: JSON.stringify(data)
-			})
-			.then(response => {
-				return response.json() // Это Promise
-			})
-			.then(json => {
-				console.debug(json)
-			})
-
-			// Если мы знаем, что в ответ придёт JSON - вместо .text() используем .json() и на
-			// входе в следующий then получим распарсенный JSON объект
-		}
-	</script>
+	<div class="footer">
+		<div class="space1"></div>
+		<button type="button" class="btn btn-info ml-5p" onclick="refresh_gr()">Add</button>
+		<button type="button" class="btn btn-success" onclick="refresh()">Refresh</button>
+	</div>
 
 </body>
 </html>

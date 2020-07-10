@@ -56,6 +56,14 @@
     border-radius: 5px;
 }
 
+.link_area {
+    background-color: lightgrey;
+    margin-top: 10px;
+    height: 80px;
+    padding: 5px 5px 5px 5px;
+    border-radius: 5px;
+}
+
 .m-b10px {
     margin-bottom: 10px;
 }
@@ -66,4 +74,8 @@
 
 .h-80px {
     height: 80px;
+}
+
+.ml-5p {
+    margin-left: 5%;
 }

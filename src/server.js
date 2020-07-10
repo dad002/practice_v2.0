@@ -1,14 +1,26 @@
 const http = require('http'); // модуль для запуска веб-сервера
 const fs = require('fs'); // модуль для работы с файлами
 const url = require('url'); // Для обработки URL
+const axios = require("axios")
+const randomName = require("random-name")
 
 const database = require('./database');  // Импортируем нашу БД
+
+var crypto = require('crypto');
+
 
 const html_log = fs.readFileSync('src/static/index.html')
 const html_reg = fs.readFileSync('src/static/reg.html')
 const html_main = fs.readFileSync('src/static/main.html')
+const html_link = fs.readFileSync('src/static/link_midl.html')
+
 const css = fs.readFileSync('src/static/css/style.css')
+
 const js = fs.readFileSync('src/static/js/action.js')
+
+const ClientID = 'sOOeFevFTcqagteoLkNYsg'
+const ClientSecret = 'yRqRLVV5jR35FS71aNuM7QVEZsWrmdQf'
+const redirect_uri = "https://127.0.0.1:5000/link_midl.html"
 
 // Парсить куки
 function parseCookies(request) {
@@ -160,11 +172,158 @@ const server = http.createServer(async (req, res) => {
 
                 data.one = 'two'
 
-                res.writeHead(200, { 'Content-Type': 'text/json' })
+                res.writeHead(200, {'Content-Type': 'text/json'})
                 res.end(JSON.stringify(data))
             })
 
             break
+
+        case '/table_GET':
+
+            // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
+            if (2 !== await database.login(cookies.login, cookies.password)) {
+                res.writeHead(200, {'Location': '/', 'Content-Type': 'text/html'});
+                res.end("<script>location.href = \"/\"</script>") // На всякий случай переадресация через JS
+                break;
+            }
+
+            const students_table = await database.getStudentsByGroup(urlObject.query.group_num);
+            res.writeHead(200, {'Content-Type': 'text/json'})
+
+            res.end(JSON.stringify(students_table))
+
+
+            break
+
+        case '/table_gr_GET':
+
+            // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
+            if (2 !== await database.login(cookies.login, cookies.password)) {
+                res.writeHead(200, {'Location': '/', 'Content-Type': 'text/html'});
+                res.end("<script>location.href = \"/\"</script>") // На всякий случай переадресация через JS
+                break;
+            }
+
+            const groups_table = await database.getGroupsByTeacher(cookies.login)
+            res.writeHead(200, {'Content-Type': 'text/json'})
+
+            res.end(JSON.stringify(groups_table))
+
+            break
+
+        case '/link_midl.html':
+            if (cookies.id !== undefined) {
+                database.checkIn(cookies.id, urlObject.query.i)
+
+                res.statusCode = 200
+                res.setHeader("Content-Type", "text/html");
+                res.setHeader("Location", await database.getLinkByHash(urlObject.query.i))
+                res.end(`<script>window.location.href = "${await database.getLinkByHash(urlObject.query.i)}"</script>`)
+                break
+            }
+
+            console.debug("Not redirecting")
+
+            if (urlObject.query.test !== undefined) {
+                const user = {
+                    first_name: randomName.first(),
+                    last_name: randomName.last(),
+                    id: Math.round(Math.random() * 1000000000),
+                    group: await database.getGroupByLinkHash(cookies.i)
+                }
+
+                await database.addStudent(user.first_name, user.last_name, user.id, user.group)
+
+                res.setHeader("Set-Cookie", `id=${user.id}`)
+                res.statusCode = 200
+                res.setHeader("Content-Type", "text/html");
+                res.setHeader("Location", await database.getLinkByHash(cookies.i))
+                res.end(`<script>window.location.href = "${await database.getLinkByHash(cookies.i)}"</script>`)
+                break;
+            }
+
+            let accessToken;
+
+            if (urlObject.query.code) {
+                try {
+                    const response = await axios({
+                        url: "https://zoom.us/oauth/token",
+                        method: "POST",
+                        headers: {
+                            "Authorization": "Basic " + Buffer.from(`${ClientID}:${ClientSecret}`, "utf-8").toString("base64")
+                        },
+                        params: {
+                            grant_type: "authorization_code",
+                            code: urlObject.query.code,
+                            redirect_uri: redirect_uri
+                        }
+                    })
+                    const data = response.data
+                    accessToken = data.access_token;
+                } catch (err) {
+                    console.error(err)
+                }
+
+                const resp = await axios({
+                    url: "https://api.zoom.us/v2/users/me",
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`
+                    }
+                })
+                const data = resp.data;
+
+                const user = {
+                    first_name: data.first_name,
+                    last_name: data.last_name,
+                    id: data.id,
+                    group: await database.getGroupByLinkHash(cookies.i)
+                }
+
+                await database.addStudent(user.first_name, user.last_name, user.id, user.group)
+
+                res.setHeader("Set-Cookie", `id=${data.id}`)
+                res.statusCode = 200
+                res.setHeader("Content-Type", "text/html");
+                res.setHeader("Location", await database.getLinkByHash(cookies.i))
+                res.end(`<script>window.location.href = "${await database.getLinkByHash(cookies.i)}"</script>`)
+                break;
+            }
+
+            res.statusCode = 200
+            res.setHeader("Content-Type", "text/html");
+            res.setHeader("Set-Cookie", `i=${urlObject.query.i}`)
+            res.end(html_link)
+            break
+
+        case '/create_link':
+
+            if (req.method !== 'POST') // Если не пост, шлём нахуй
+                break;
+
+            let postData_ = "";
+
+            req.on("data", chunk => postData_ += chunk)
+            req.on("end", async () => {
+                // Получили все данные, идём дальше
+
+                // console.debug(postData)
+
+                // Парсим данные из POST запроса
+                var postDataObject = JSON.parse(postData_)
+
+                let start_hash = cookies.login + '_' + postDataObject.group
+                var hash = crypto.createHash('md5').update(start_hash).digest('hex');
+                let res_link = '/link_midl.html?i=' + hash
+
+                await database.setLink(hash, postDataObject.link, postDataObject.group, cookies.login)
+
+                res.writeHead(200, {'Content-Type': 'text/plain'});
+                res.end(res_link)
+            });
+
+            break
+
         default:
             res.writeHead(200, {'Content-Type': 'text/plain'});
             res.end("<h1>Error 404: NOT FOUND</h1>")
