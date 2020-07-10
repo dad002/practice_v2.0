@@ -110,18 +110,7 @@ async function register(login, password) {
     return regRes;
 }
 
-<<<<<<< Updated upstream
-// Для того, чтобы можно было сделать require
-module.exports = {
-    db,
-    get,
-    checkTeacher,
-    addTeacher,
-    addClass,
-    login,
-    register
-};
-=======
+// Добавление урока true-если успешно, false-если нет
 function addLesson(groupID, teacherID, date) {
     return new Promise((resolve, reject) => {
 
@@ -140,10 +129,64 @@ function addLesson(groupID, teacherID, date) {
     });
 }
 
-function getStudentsByGroup(Number) {
+// вернет пустой массив если нихуя нет или ошибка, или вернет массив данных студентов
+
+function getStudentsByGroup(number) {
     return new Promise((resolve, reject) => {
-        sql = "SELECT Name, Surname, Zoom "
+        let sql = "SELECT Student.Name, Student.Surname, Student.Zoom FROM Student JOIN Class ON Student.GroupID = Class.ID WHERE Class.Number = (?)"
+
+        let res = [];
+        db.all(sql, [number], (err, rows) => {
+            if (err) {
+                console.log(err.message)
+                resolve(res)
+            }
+
+            rows.forEach(row => {
+                res.push(row);
+            });
+
+            resolve(res)
+        })
     });
 
 }
->>>>>>> Stashed changes
+
+function getGroupsByTeacher(teacherID) {
+    return new Promise((resolve, reject) => {
+
+        let sql = 'SELECT Number FROM Class WHERE Class.TeacherID = (?)';
+        let res = [];
+
+        db.all(sql, [teacherID], (err, rows) => {
+           if (err) {
+               console.log(err.message);
+               resolve(res);
+           }
+
+            rows.forEach(row => {
+               res.push(row);
+            });
+
+           resolve(res);
+        });
+    });
+}
+
+function addStudent(name, surname, zoom, groupNumber) {
+    return new Promise((resolve, reject) => {
+        sql = "INSERT INTO Student (Name, Surname, Zoom, GroupID) VALUES (?, ?, ?, ?)"
+    });
+}
+
+// Для того, чтобы можно было сделать require
+module.exports = {
+    db,
+    login,
+    register,
+    addClass,
+    addLesson,
+    getStudentsByGroup,
+    getGroupsByTeacher
+};
+
