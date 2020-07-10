@@ -9,32 +9,34 @@
           integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" rel="stylesheet">
 
     <script src="action.js"></script>
+    <script src="../database.js"></script>
 </head>
 <body>
-
-<div class="main">
-    <div class="form">
-        <form>
-            <div class="form-group">
-                <label for="exampleInputEmail1">Login</label>
-                <input aria-describedby="emailHelp" name="login" class="form-control" id="exampleInputEmail1" type="text">
-            </div>
-            <div class="form-group">
-                <label for="exampleInputPassword1">Password</label>
-                <input class="form-control" id="exampleInputPassword1" name="password" type="password">
-            </div>
-            <button class="btn btn-primary" type="submit">Submit</button>
-            <a class="non btn btn-danger" href="reg.html">Reg</a>
-        </form>
+    
+    <div class="main">
+        <div class="space1" style="height: 110px;"></div>
+        <div class="form">
+            <form>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Login</label>
+                    <input aria-describedby="emailHelp" name="login" class="form-control" id="InputLogin" type="text">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input class="form-control" id="InputPassword" name="password" type="password">
+                </div>
+                <a href="main.html"><button type="button" class="btn btn-primary" onclick="login()">Login</button></a>
+                <a href="reg.html" ><button type="button" class="btn btn-primary">Registration</button></a>
+            </form>
+        </div>
+        <div class="space1"></div>
     </div>
-    <div class="space1"></div>
-</div>
 
-<div class="footer">
-
-</div>
-
-<!--button type="button" class="btn btn-primary" onclick="action()">Нажми плз</button!-->
+    <div class="footer">
+        <button type="button" class="btn btn-secondary" onclick="view()">View</button>
+        <button type="button" class="btn btn-danger" onclick="deleteCookie('user')">Delete</button>
+        <button type="button" class="btn btn-primary" onclick="setCookie('user', 'my name')">Make</button>
+    </div>
 
 </body>
 </html>

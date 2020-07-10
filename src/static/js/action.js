@@ -1,3 +1,5 @@
+const cookies = document.cookie
+
 function action() {
-    alert('Node.js в действии')
+	alert(cookies)
 }
