@@ -356,10 +356,46 @@ function getTeacherByLinkHash(hashLink) {
     });
 }
 
+function getStudentsAttendence(studentID) {
+    return new Promise ((resolve) => {
+        // language=TEXT
+        let sql = 'SELECT CAST((SELECT CAST(COUNT(*) as float) CNT\n             FROM Student\n                      JOIN Attendance on Student.ID = Attendance.StudentID\n             WHERE StudentID = (?)\n             GROUP BY StudentID\n             LIMIT 1) / (SELECT CAST(COUNT(L.ID) as float) CNTALL\n                         FROM Student\n                                  JOIN Lesson L on Student.GroupID = L.GroupID\n                         WHERE Student.ID = (?)\n                         GROUP BY Student.ID\n                         LIMIT 1) * 100 as integer) Attendance;';
+        let res = [];
 
-getGroupsByTeacher("test").then(res => {
-    console.log(res)
-})
+        db.all(sql,[studentID, studentID],(err, rows) => {
+           if (err) {
+               console.log(err.message);
+               resolve(res);
+           }
+
+           rows.forEach(row => {
+                res.push(row)
+           });
+           resolve(res)
+        });
+    })
+}
+
+function getGroupAttendence(groupID) {
+    return new Promise((resolve) => {
+        // language=TEXT
+        let sql = 'SELECT CAST((SELECT COUNT(S.ID) CNT\n             FROM Student S\n                      JOIN Attendance A on S.ID = A.StudentID\n             WHERE A.GroupID = (?)\n             GROUP BY A.GroupID\n             LIMIT 1) / (SELECT CAST(COUNT(S.ID) AS float) CNTALL\n                         FROM Student S\n                                  JOIN Class C ON S.GroupID = C.ID\n                         WHERE GroupID = (?)\n                         GROUP BY GroupID\n                         LIMIT 1) * 100 as integer) Attendance;';
+
+        db.all(sql,[groupID, groupID],(err, rows) => {
+            let res = [];
+
+            if (err) {
+                console.log(err.message);
+                resolve(res);
+            }
+
+            rows.forEach(row => {
+                res.push(row);
+            });
+            resolve(res);
+        });
+    });
+}
 // Для того, чтобы можно было сделать require
 module.exports = {
     db,
