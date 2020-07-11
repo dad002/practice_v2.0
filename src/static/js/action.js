@@ -36,11 +36,18 @@ function refresh_gr() {
 			  }
 			  element.innerText = `Группа ${el.Number}`
 			  dropdownMenu.append(element);
-			  
-
-			})
+			})  
+			// space-line
 			element = document.createElement("div");
 			element.classList.add("dropdown-divider");
+			dropdownMenu.append(element);
+
+			// input line
+			element = document.createElement("input");
+			element.classList.add("form-control");
+			element.classList.add("bar_func");
+			element.classList.add("m-b10px");
+			element.classList.add("m-t10px");
 			dropdownMenu.append(element);
 
 			// button Add
@@ -48,10 +55,12 @@ function refresh_gr() {
 			element.classList.add("btn");
 			element.classList.add("btn-success");
 			element.classList.add("ml-17p");
+			element.classList.add("bar_func");
 			element.type = 'button'
 			element.onclick = Add_Group
 			element.innerText = `Add Group`
 			dropdownMenu.append(element);
+
 			resolve()
 		})
 	})
@@ -137,7 +146,6 @@ function Add_Group() {
 	.then(response => response.json())
 	.then(json => {
 		refresh_gr()
-		console.log(json)
 		// document.getElementById('link').value = window.location.origin + text
 	})
 }

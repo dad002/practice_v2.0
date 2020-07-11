@@ -55,43 +55,21 @@ function addTeacher(login, password) {
     });
 }
 
-function getTeacherIDbyLogin(login) {
-    return new Promise((resolve, reject) => {
-
-        let res = '';
-
-        db.all('SELECT ID FROM Teacher WHERE Login = (?)', [ login], (err, row) => {
-            if (err) {
-                console.log(err.message);
-                resolve(res);
-            }
-
-            res = row[0].ID;
-            console.log(row[0].ID);
-            resolve(res)
-        });
-    });
-}
-
 // Добавление класса учителем
-function addClass(classNumber, login) {
+function addClass(classNumber, teacherID) {
 
     return new Promise((resolve, reject) => {
 
         let res = false;
 
-        getTeacherIDbyLogin(login).then(teacherID => {
+        db.run('INSERT INTO Class(Number, TeacherID) VALUES (?, ?)', [classNumber, teacherID], (err) => {
+            if (err) {
+                console.log(err.message);
+                resolve(res);
+            }
 
-            db.run('INSERT INTO Class(Number, TeacherID) VALUES (?, ?)', [classNumber, teacherID], (err) => {
-                if (err) {
-                    console.log(err.message);
-                    resolve(res);
-                }
-
-                res = true;
-                resolve(res)
-            });
-
+            res = true;
+            resolve(res)
         });
     });
 }
@@ -239,6 +217,27 @@ function addStudent(name, surname, zoom, groupNumber) {
                     resolve(res);
                 });
             }
+        });
+    });
+}
+
+function getGroupByTeacher(login) {
+    return new Promise ((resolve, reject) => {
+        let sql = "SELECT Number FROM Class WHERE TeacherID = (?)";
+        let res = [];
+
+        db.all(sql, [login], (err, rows) => {
+
+            if (err) {
+                console.log(err.message);
+                resolve(res)
+            }
+
+            rows.forEach(row => {
+               res.push(row);
+            });
+
+            resolve(res);
         });
     });
 }
@@ -396,10 +395,6 @@ function getGroupAttendance(groupID) {
         });
     });
 }
-
-addClass('M3203', 'test1').then(a =>{
-    console.log(a);
-});
 // Для того, чтобы можно было сделать require
 module.exports = {
     db,
