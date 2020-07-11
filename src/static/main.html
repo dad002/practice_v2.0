@@ -78,9 +78,10 @@
 				<input class="form-control m-b10px" type="text" placeholder="Link here..." id="link_input">
 				<input id="link" class="form-control w-100p m-b10px" placeholder="Здесь будет ссылка" />
 				<button type="button" class="btn btn-warning w-100p h-80px" onclick="create_link()">Gen Link</button>
-			</div>
+			</div>	
+			<a href="#" class="btn btn-info inline w-100p" style="margin-bottom: 10px">Statistic</a><br>
 			<div class="custom-control custom-radio">
-			  <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input">
+			  <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input" checked>
 			  <label class="custom-control-label" for="customRadio1">Students</label>
 			</div>
 			<div class="custom-control custom-radio">
@@ -93,7 +94,7 @@
 				<table class="table">
 				  	<thead>
 				    	<tr>
-				      		<th scope="col" id="gr_num">#</th>
+				      		<th scope="col" id="gr_num2">#</th>
 				      		<th scope="col">Name/Surname</th>
 				      		<th scope="col">Statistic</th>
 				    	</tr>
@@ -123,7 +124,7 @@
 
 	<div class="footer">
 		<div class="space1"></div>
-		<button type="button" class="btn btn-success ml-5p" onclick="refresh()">Refresh</button>
+		<button type="button" class="btn btn-success ml-5p" onclick="statsStudents()">Refresh</button>
 	</div>
 
 </body>

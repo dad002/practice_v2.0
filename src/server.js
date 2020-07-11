@@ -345,27 +345,17 @@ const server = http.createServer(async (req, res) => {
                 })
             }
 
-            console.log(groupStats)
             res.writeHead(200, {'Content-Type': 'text/json'});
             res.end(JSON.stringify(groupStats))
 
             break
 
         case '/statsStudents':
-            // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
-            // if (2 !== await database.login(cookies.login, cookies.password)) {
-            //     res.writeHead(200, {'Location': '/', 'Content-Type': 'text/html'});
-            //     res.end("<script>location.href = \"/\"</script>") // На всякий случай переадресация через JS
-            //     break;
-            // }
-
 
             const group = await database.getGroupIDbyNumber(urlObject.query.group_num);
 
             const studentStats = [];
             let students = await database.getStudentsByGroup(urlObject.query.group_num);
-
-            console.log(students)
 
             for (let i = 0; i < students.length; i++) {
                 let student = students[i]
@@ -378,6 +368,14 @@ const server = http.createServer(async (req, res) => {
 
             res.writeHead(200, {'Content-Type': 'text/json'});
             res.end(JSON.stringify(studentStats))
+
+            break
+
+        case '/AddGr':
+            const new_group = await database.addClass("Xyinia1234", cookies.login)
+            console.log(cookies.login)
+            res.writeHead(200, {'Content-Type': 'text/json'});
+            res.end(JSON.stringify(new_group))
 
             break
 

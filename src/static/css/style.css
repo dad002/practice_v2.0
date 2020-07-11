@@ -3,6 +3,10 @@
     margin-left: 36%;
 }
 
+.login {
+    margin-right: 1%;
+}
+
 .my_table {
     float: left;
     width: 50%;
@@ -65,10 +69,13 @@
 
 .float_left {
     float: left;
+    width: 45%;
 }
 
 .float_right {
     float: right;
+    width: 45%;
+    marging-left: 5%;
 }
 
 .red_squear {
@@ -89,4 +96,8 @@
 
 .ml-5p {
     margin-left: 5%;
+}
+
+.ml-17p {
+    margin-left: 17%;
 }
