@@ -325,6 +325,60 @@ const server = http.createServer(async (req, res) => {
 
             break
 
+        case '/statsGroup':
+            // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
+            if (2 !== await database.login(cookies.login, cookies.password)) {
+                res.writeHead(200, {'Location': '/', 'Content-Type': 'text/html'});
+                res.end("<script>location.href = \"/\"</script>") // На всякий случай переадресация через JS
+                break;
+            }
+
+            const groupStats = [];
+            const groups = await database.getGroupsByTeacher(cookies.login);
+
+            for (let i = 0; i < groups.length; i++) {
+                const group = groups[i].ID;
+                const attendance = (await database.getGroupAttendance(group))[0].Attendance
+                groupStats.push({
+                    GroupID: groups[i].Number,
+                    Attendance: (attendance === null ? 0 : attendance) + "%"
+                })
+            }
+
+            res.writeHead(200, {'Content-Type': 'text/json'});
+            res.end(JSON.stringify(groupStats))
+
+            break
+
+        case '/statsStudents':
+
+            const group = await database.getGroupIDbyNumber(urlObject.query.group_num);
+
+            const studentStats = [];
+            let students = await database.getStudentsByGroup(urlObject.query.group_num);
+
+            for (let i = 0; i < students.length; i++) {
+                let student = students[i]
+                let attendance = (await database.getStudentsAttendance(student.ID))[0].Attendance;
+                studentStats.push({
+                    Name: `${student.Name} ${student.Surname}`,
+                    Attendance: (attendance === null ? 0 : attendance) + '%'
+                })
+            }
+
+            res.writeHead(200, {'Content-Type': 'text/json'});
+            res.end(JSON.stringify(studentStats))
+
+            break
+
+        case '/AddGr':
+            const new_group = await database.addClass("Xyinia1234", cookies.login)
+            console.log(cookies.login)
+            res.writeHead(200, {'Content-Type': 'text/json'});
+            res.end(JSON.stringify(new_group))
+
+            break
+
         default:
             res.writeHead(200, {'Content-Type': 'text/plain'});
             res.end("<h1>Error 404: NOT FOUND</h1>")

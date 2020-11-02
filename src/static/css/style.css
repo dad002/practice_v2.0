@@ -3,9 +3,13 @@
     margin-left: 36%;
 }
 
+.login {
+    margin-right: 1%;
+}
+
 .my_table {
     float: left;
-    width: 50%;
+    width: 35%;
     margin-left: 5%;
 }
 
@@ -26,7 +30,7 @@
     float: right;
     
 
-    width: 38%;
+    width: 45%;
 
     margin-right: 5%;
 
@@ -65,18 +69,32 @@
 
 .float_left {
     float: left;
+    width: 45%;
 }
 
 .float_right {
     float: right;
+    width: 45%;
 }
 
 .red_squear {
     border: 2px solid red;
 }
 
+.dropdown-menu {
+    text-align: center;
+}
+
+.bar_func {
+    display: inline-block;
+}
+
 .m-b10px {
     margin-bottom: 10px;
+}
+
+.m-t10px {
+    margin-top: 10px;
 }
 
 .w-100p {
@@ -89,4 +107,8 @@
 
 .ml-5p {
     margin-left: 5%;
+}
+
+.ml-17p {
+    margin-left: 17%;
 }
