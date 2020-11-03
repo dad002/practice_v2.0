@@ -165,6 +165,56 @@ const server = http.createServer(async (req, res) => {
 
             res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
             res.end(html_main)
+<<<<<<< HEAD
+=======
+
+            if (req.method === "POST") {
+                // Получаем данные POST запроса
+
+                let postData = "";
+
+                req.on("data", chunk => postData += chunk)
+
+                req.on("end", async () => {
+                    // Получили все данные, идём дальше
+
+                    console.debug(postData)
+
+                //     // Парсим данные из POST запроса
+                //     var postDataObject = parsePost(postData)
+                //
+                //     // Берём из них логин и пароль
+                //     let login = postDataObject.login, password = postDataObject.password;
+                //
+                //     // Чекаем логин
+                //     let result = await database.login(login, password);
+                //
+                //     let success = result === 2; // Если 2, значит такой юзер есть
+                //
+                //     // Если успех - переадресуем на /main.html
+                //     if (success) {
+                //         console.debug("Логин: успешно")
+                //         res.setHeader('Location', '/main.html');  // переадресация
+                //         res.setHeader('Set-Cookie', [`login=${login}`, `password=${password}`]);
+                //         res.end("<script>location.href = \"/main.html\"</script>") // На всякий случай переадресация через JS
+                //     } else {  // Если не успех - возвращаем обратно
+                //         console.debug("Логин: Не успешно")
+                //         res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
+                //         res.end(html_log);
+                //     }
+                // });
+                // break;
+            })}
+            break
+        case '/testPOST':
+            if (req.method !== 'POST') // Если не пост, шлём нахуй
+                break;
+            // Получаем данные POST запроса
+
+            let postData = "";
+
+            req.on("data", chunk => postData += chunk)
+>>>>>>> master
 
             break
         case '/html_admin':
@@ -377,6 +427,7 @@ const server = http.createServer(async (req, res) => {
         case '/AddGr':
             if (req.method !== 'POST') // Если не пост, шлём нахуй
                 break;
+<<<<<<< HEAD
 
             let ngr_dataPOST = "";
 
@@ -413,6 +464,21 @@ const server = http.createServer(async (req, res) => {
                 var postDataObject = JSON.parse(nst_dataPOST)
                 console.log(postDataObject)
                 // const new_group = await database.studentRegister(postDataObject.groupNum, cookies.id)
+=======
+
+            let ngr_dataPOST = "";
+
+            req.on("data", chunk => ngr_dataPOST += chunk)
+            req.on("end", async () => {
+                // Получили все данные, идём дальше
+
+                // console.debug(postData)
+
+                // Парсим данные из POST запроса
+                var postDataObject = JSON.parse(ngr_dataPOST)
+                console.log(postDataObject)
+                const new_group = await database.addClass(postDataObject.groupNum, cookies.id)
+>>>>>>> master
 
                 res.writeHead(200, {'Content-Type': 'text/json'});
                 res.end(JSON.stringify(new_group))

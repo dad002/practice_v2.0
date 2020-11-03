@@ -147,15 +147,22 @@ function login(Login, Password) {
 // Добавление класса учителем
 function addClass(classNumber, login) {
 
+<<<<<<< HEAD
+=======
+    let teacherID = getTeacherIDByLogin(login);
+>>>>>>> master
 
     return new Promise((resolve, reject) => {
 
         let res = false;
 
+<<<<<<< HEAD
         getTeacherIDByLogin(login).then(tmpRes => {
             teacherID = tmpRes;
         });
 
+=======
+>>>>>>> master
         db.run('INSERT INTO Class(Number, TeacherID) VALUES (?, ?) ', [classNumber, teacherID], (err) => {
             if (err) {
                 console.log(err.message);
@@ -188,6 +195,7 @@ function addLesson(groupID, teacherID, date) {
 }
 
 function getTeacherIDByLogin(login) {
+<<<<<<< HEAD
     console.log(login);
     let sql = "SELECT ID FROM Teacher Where Login = (?)";
 
@@ -207,6 +215,26 @@ function getTeacherIDByLogin(login) {
     
 }
 
+=======
+    
+    let sql = "SELECT ID FROM Teacher WHERE Login = (?)";
+    
+    return new Promise((resolve, reject) => {
+        
+        db.run(sql, [login], function (err, row) {
+            if (err) {
+                console.log(err.message);
+                resolve(null)
+            }
+
+            resolve(row.ID);
+        });
+        
+    });
+    
+}
+
+>>>>>>> master
 // вернет пустой массив если нихуя нет или ошибка, или вернет массив данных студентов
 function getStudentsByGroup(number) {
     return new Promise((resolve, reject) => {

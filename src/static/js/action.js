@@ -64,8 +64,15 @@ function refresh_gr() {
 
 			// button Add
 			element = document.createElement("button");
+<<<<<<< HEAD
 			element.classList.add("invertBtn");
 			element.classList.add("ml-2");
+=======
+			/*element.classList.add("btn");
+			element.classList.add("btn-success");
+			element.classList.add("ml-17p");
+			element.classList.add("bar_func");*/
+>>>>>>> master
 			element.type = 'button'
 			element.onclick = Add_Group
 			element.innerText = `Add Group`
