@@ -15,7 +15,6 @@
 	<script src="action.js"></script>
 </head>
 <body>
-	<div class="space1" style="height: 30px;"></div>
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
 
 	  	<div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -65,14 +64,12 @@
 		</table>
 	</div>
 
-	
-
 	<div class="right-bar">
 		<div class="float_right">
 			<div class="link-gen" style="height: 185px;">
 				<input class="form-control m-b10px" type="text" placeholder="Link here..." id="link_input">
 				<input id="link" class="form-control w-100p m-b10px" placeholder="Здесь будет ссылка" />
-				<button type="button" class="btn btn-warning w-100p h-80px" onclick="create_link()">Gen Link</button>
+				<button type="button" class="" onclick="create_link()">Gen Link</button>
 			</div>	
 			<a href="#" class="btn btn-info inline w-100p" style="margin-bottom: 10px">Statistic</a><br>
 			<div class="custom-control custom-radio">
@@ -119,7 +116,29 @@
 
 	<div class="footer">
 		<div class="space1"></div>
-		<button type="button" class="btn btn-success ml-5p" onclick="statsStudents()">Refresh</button>
+		<form method="POST" action="" class="add-student-form ml-5p">
+			<div class="form-group">
+				<label for="name">Name</label>
+				<br>
+				<input type="text" id="name">
+			</div>
+			<div class="form-group">
+				<label for="name">Surname</label>
+				<br>
+				<input type="text" id="surname">
+			</div>
+			<div class="form-group">
+				<label for="login">Login</label>
+				<br>
+				<input type="text" id="login">
+			</div>
+			<div class="form-group">
+				<label for="password">Password</label>
+				<br>
+				<input type="password" id="password">
+			</div>
+			<button type="submit" class="" onclick="studentRegister()">Add Student</button>
+		</form>
 	</div>
 
 </body>

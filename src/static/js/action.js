@@ -5,6 +5,18 @@ function action() {
 	alert(cookies)
 }
 
+/*function addStudent() {
+	fetch('/AddSt', {method: 'POST',
+		credentials: 'include',
+		body: JSON.stringify({groupNum: document.querySelector('#navbarSupportedContent > ul > li > div > input').value})
+	})
+		.then(response => response.json())
+		.then(json => {
+			refresh_gr()
+			// document.getElementById('link').value = window.location.origin + text
+		})
+}*/
+
 function parseCookies() {
 	var list = {},
 		rc = document.cookie;
@@ -52,10 +64,10 @@ function refresh_gr() {
 
 			// button Add
 			element = document.createElement("button");
-			element.classList.add("btn");
+			/*element.classList.add("btn");
 			element.classList.add("btn-success");
 			element.classList.add("ml-17p");
-			element.classList.add("bar_func");
+			element.classList.add("bar_func");*/
 			element.type = 'button'
 			element.onclick = Add_Group
 			element.innerText = `Add Group`
@@ -142,7 +154,9 @@ function create_link() {
 
 function Add_Group() {
 	fetch('/AddGr', {method: 'POST', 
-		credentials: 'include'})
+		credentials: 'include',
+		body: JSON.stringify({groupNum: document.querySelector('#navbarSupportedContent > ul > li > div > input').value})
+		})
 	.then(response => response.json())
 	.then(json => {
 		refresh_gr()

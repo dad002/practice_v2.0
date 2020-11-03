@@ -16,8 +16,9 @@ const html_main = fs.readFileSync('src/static/main.html')
 const html_link = fs.readFileSync('src/static/link_midl.html')
 
 const css = fs.readFileSync('src/static/css/style.css')
-
 const js = fs.readFileSync('src/static/js/action.js')
+
+const bg = fs.readFileSync('src/img/bg.jpg')
 
 const ClientID = 'sOOeFevFTcqagteoLkNYsg'
 const ClientSecret = 'yRqRLVV5jR35FS71aNuM7QVEZsWrmdQf'
@@ -109,6 +110,10 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(200, {'Content-Type': 'text/javascript'}); // plain - в случае обычного текста
             res.end(js)
             break
+        case '/assets/img/bg.jpg':
+            res.writeHead(200, {'Content-Type': 'img'}); // plain - в случае обычного текста
+            res.end(bg)
+            break
         case '/reg.html':  // Экран регистрации
             if (req.method === "POST") {
                 let postData = "";
@@ -158,6 +163,44 @@ const server = http.createServer(async (req, res) => {
 
             res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
             res.end(html_main)
+
+            if (req.method === "POST") {
+                // Получаем данные POST запроса
+
+                let postData = "";
+
+                req.on("data", chunk => postData += chunk)
+
+                req.on("end", async () => {
+                    // Получили все данные, идём дальше
+
+                    console.debug(postData)
+
+                //     // Парсим данные из POST запроса
+                //     var postDataObject = parsePost(postData)
+                //
+                //     // Берём из них логин и пароль
+                //     let login = postDataObject.login, password = postDataObject.password;
+                //
+                //     // Чекаем логин
+                //     let result = await database.login(login, password);
+                //
+                //     let success = result === 2; // Если 2, значит такой юзер есть
+                //
+                //     // Если успех - переадресуем на /main.html
+                //     if (success) {
+                //         console.debug("Логин: успешно")
+                //         res.setHeader('Location', '/main.html');  // переадресация
+                //         res.setHeader('Set-Cookie', [`login=${login}`, `password=${password}`]);
+                //         res.end("<script>location.href = \"/main.html\"</script>") // На всякий случай переадресация через JS
+                //     } else {  // Если не успех - возвращаем обратно
+                //         console.debug("Логин: Не успешно")
+                //         res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
+                //         res.end(html_log);
+                //     }
+                // });
+                // break;
+            })}
             break
         case '/testPOST':
             if (req.method !== 'POST') // Если не пост, шлём нахуй
@@ -372,11 +415,25 @@ const server = http.createServer(async (req, res) => {
             break
 
         case '/AddGr':
-            const new_group = await database.addClass("Xyinia1234", cookies.login)
-            console.log(cookies.login)
-            res.writeHead(200, {'Content-Type': 'text/json'});
-            res.end(JSON.stringify(new_group))
+            if (req.method !== 'POST') // Если не пост, шлём нахуй
+                break;
 
+            let ngr_dataPOST = "";
+
+            req.on("data", chunk => ngr_dataPOST += chunk)
+            req.on("end", async () => {
+                // Получили все данные, идём дальше
+
+                // console.debug(postData)
+
+                // Парсим данные из POST запроса
+                var postDataObject = JSON.parse(ngr_dataPOST)
+                console.log(postDataObject)
+                const new_group = await database.addClass(postDataObject.groupNum, cookies.id)
+
+                res.writeHead(200, {'Content-Type': 'text/json'});
+                res.end(JSON.stringify(new_group))
+            });
             break
 
         default:
