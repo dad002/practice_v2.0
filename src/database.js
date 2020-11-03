@@ -1,5 +1,5 @@
 let sqlite = require('sqlite3').verbose();
-let Promise = require('bluebird')
+let Promise = require('bluebird');
 
 let db = new sqlite.Database('data.db');
 
@@ -15,6 +15,36 @@ function get() {
             console.log(row);
         });
     });
+}
+
+
+// register (true - если успешно, false - если неуспешно)
+async function teacherRegister(login, password) {
+    let regRes = false;
+
+    checkTeacher(login).then(res => {
+        regRes = res;
+    });
+
+    if (regRes === false) {
+        regRes = await addTeacher(login, password);
+    }
+
+    return regRes;
+}
+
+async function studentRegister(login, password, name, surname, groupID) {
+    let regRes = false;
+
+    checkStudent(login).then(res => {
+        regRes = res;
+    });
+
+    if (regRes === false) {
+        regRes = await addStudent(login, password, name, surname, groupID);
+    }
+
+    return regRes;
 }
 
 // Проверка наличия учителя с подобным логином (true - если нет, false - если есть)
@@ -39,7 +69,29 @@ function checkTeacher(login) {
 
 }
 
+function checkStudent(login) {
+
+    let sql = "SELECT Login From Student Where Login = (?)";
+
+    return new Promise((resolve, reject) => {
+        db.all(sql, [login], (err, row) => {
+            let res = false;
+
+            if (err) {
+                reject(err);
+            }
+
+            if (row.length === 0) {
+                res = true;
+            }
+
+            resolve(res);
+        })
+    })
+
+}
 // Добавление учителя в базу данных (true - если удалось добавить, false - если нет)
+
 function addTeacher(login, password) {
     return new Promise((resolve, reject) => {
         let res = false;
@@ -49,27 +101,25 @@ function addTeacher(login, password) {
                 console.log(err.message);
                 resolve(res)
             }
+
             res = true;
             resolve(res);
         });
     });
 }
 
-// Добавление класса учителем
-function addClass(classNumber, teacherID) {
-
+function addStudent(login, password, name, surname, groupID) {
     return new Promise((resolve, reject) => {
-
         let res = false;
 
-        db.run('INSERT INTO Class(Number, TeacherID) VALUES (?, ?)', [classNumber, teacherID], (err) => {
+        db.run('INSERT INTO Teacher(Name, Surname, GroupID, Login, Password) VALUES (?, ?, ?, ?, ?)', [name, surname, groupID, login, password], function(err) {
             if (err) {
                 console.log(err.message);
-                resolve(res);
+                resolve(res)
             }
 
             res = true;
-            resolve(res)
+            resolve(res);
         });
     });
 }
@@ -94,20 +144,28 @@ function login(Login, Password) {
         });
     })
 }
+// Добавление класса учителем
+function addClass(classNumber, login) {
 
-// register (true - если успешно, false - если неуспешно)
-async function register(login, password) {
-    let regRes = false;
 
-    checkTeacher(login).then(res => {
-        regRes = res;
+    return new Promise((resolve, reject) => {
+
+        let res = false;
+
+        getTeacherIDByLogin(login).then(tmpRes => {
+            teacherID = tmpRes;
+        });
+
+        db.run('INSERT INTO Class(Number, TeacherID) VALUES (?, ?) ', [classNumber, teacherID], (err) => {
+            if (err) {
+                console.log(err.message);
+                resolve(res);
+            }
+
+            res = true;
+            resolve(res)
+        });
     });
-
-    if (regRes === false) {
-        regRes = await addTeacher(login, password);
-    }
-
-    return regRes;
 }
 
 // Добавление урока true-если успешно, false-если нет
@@ -129,11 +187,30 @@ function addLesson(groupID, teacherID, date) {
     });
 }
 
-// вернет пустой массив если нихуя нет или ошибка, или вернет массив данных студентов
+function getTeacherIDByLogin(login) {
+    console.log(login);
+    let sql = "SELECT ID FROM Teacher Where Login = (?)";
 
+    return new Promise((resolve, reject) => {
+        
+        db.get(sql, [login], function (err, row) {
+
+            if (err) {
+                console.log(err.message);
+                resolve(null)
+            }
+
+            resolve(row.ID);
+        });
+        
+    });
+    
+}
+
+// вернет пустой массив если нихуя нет или ошибка, или вернет массив данных студентов
 function getStudentsByGroup(number) {
     return new Promise((resolve, reject) => {
-        let sql = "SELECT Student.Name, Student.Surname, Student.Zoom, Student.ID FROM Student JOIN Class ON Student.GroupID = Class.ID WHERE Class.Number = (?)"
+        let sql = "SELECT Student.Name, Student.Surname, Student.ID FROM Student JOIN Class ON Student.GroupID = Class.ID WHERE Class.Number = (?)"
 
         let res = [];
         db.all(sql, [number], (err, rows) => {
@@ -395,11 +472,13 @@ function getGroupAttendance(groupID) {
         });
     });
 }
+
 // Для того, чтобы можно было сделать require
 module.exports = {
     db,
     login,
-    register,
+    teacherRegister,
+    studentRegister,
     addClass,
     addLesson,
     getStudentsByGroup,
@@ -410,6 +489,7 @@ module.exports = {
     getTeacherByLinkHash,
     getStudentsAttendance,
     getGroupAttendance,
-    getGroupIDbyNumber
+    getGroupIDbyNumber,
+    studentRegister
 };
 

@@ -389,7 +389,7 @@ const server = http.createServer(async (req, res) => {
                 // Парсим данные из POST запроса
                 var postDataObject = JSON.parse(ngr_dataPOST)
                 console.log(postDataObject)
-                const new_group = await database.addClass(postDataObject.groupNum, cookies.login)
+                const new_group = await database.addClass(postDataObject.groupNum, cookies.id)
 
                 res.writeHead(200, {'Content-Type': 'text/json'});
                 res.end(JSON.stringify(new_group))
