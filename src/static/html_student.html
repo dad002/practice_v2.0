@@ -47,39 +47,20 @@
         </table>
     </div>
 
-    <div class="right-bar">
-        <form method="POST" action="" class="add-student-form2 right-bar ml-5p text-light">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <br>
-                <input type="text" id="name" class="form-control">
+    <div class="float-right w-45ps student-statistic">
+        <label for="allBattery">Your Statistic</label>
+        <div>
+            <div id="allBattery">
+                <div id="curEn"></div>
             </div>
-            <div class="form-group">
-                <label for="surname">Surname</label>
-                <br>
-                <input type="text" id="surname" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="login">Login</label>
-                <br>
-                <input type="text" id="login" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <br>
-                <input type="password" id="password" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="group">Group</label>
-                <br>
-                <input type="text" id="group" class="form-control">
-            </div>
-            <button type="button" class="" onclick="Add_Student()">Add Student</button>
-        </form>
+        </div>
+        <span id="digitStat">$%</span>
     </div>
 
     <div class="space1"></div>
-    <div class="footer"></div>
+    <div class="footer">
+        <button type="button" onclick="studentStat()" id="testButton">refresh My Stat</button>
+    </div>
 
 </body>
 </html>

@@ -134,7 +134,7 @@ const server = http.createServer(async (req, res) => {
 
                     let login = postDataObject.login, password = postDataObject.password;
 
-                    let success = await database.register(login, password); // Регистрируем пользователя и true/false используем как успешность
+                    let success = await database.teacherRegister(login, password); // Регистрируем пользователя и true/false используем как успешность
 
                     // Если успех - переадресуем на /main.html
                     if (success) {
@@ -341,7 +341,7 @@ const server = http.createServer(async (req, res) => {
 
             for (let i = 0; i < groups.length; i++) {
                 const group = groups[i].ID;
-                const attendance = (await database.getGroupAttendance(group))[0].Attendance
+                const attendance = (await database.getGroupAttendance(group))[0].Attendance;
                 groupStats.push({
                     GroupID: groups[i].Number,
                     Attendance: (attendance === null ? 0 : attendance) + "%"

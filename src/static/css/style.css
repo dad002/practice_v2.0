@@ -11,7 +11,10 @@ button {
     border: 2px solid white;
 }
 
-<<<<<<< HEAD
+label {
+    color: white;
+}
+
 button.invertBtn {
     color: black;
     border: 2px solid black;
@@ -22,11 +25,8 @@ body {
     background-image: url("/assets/img/bg.jpg");
     background-size: cover;
     color: white;
-=======
-body {
-    background-image: url("../../img/bg.jpg");
->>>>>>> master
 }
+
 
 .form {
     width: 25%;
@@ -140,17 +140,49 @@ body {
 
 .add-student-form {
     width: 20%;
-<<<<<<< HEAD
 }
+
 .add-student-form2 {
     width: 50%;
 }
 
 input.form-control {
     background-color: rgba(255, 255, 255, 0.8);
-=======
+}
 
-    /*background-color: lightgrey;
-    border: 2px solid red;*/
->>>>>>> master
+.w-45ps {
+    width: 45%;
+}
+
+#allBattery {
+    width: 15em;
+    height: 50px;
+
+    padding-left: 5px;
+    padding-top: 4px;
+
+
+    border: 2px solid white;
+    border-radius: 5%;
+
+    display: inline-block;
+}
+
+#curEn {
+    width: 98%;
+    height: 38px;
+
+    background-color: lightgray;
+}
+
+#digitStat {
+    color: white;
+}
+
+.student-statistic {
+    text-align: center;
+}
+
+#testButton {
+    margin-left: 5em;
 }

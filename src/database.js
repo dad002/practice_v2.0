@@ -17,31 +17,35 @@ function get() {
     });
 }
 
-
 // register (true - если успешно, false - если неуспешно)
 async function teacherRegister(login, password) {
     let regRes = false;
 
-    checkTeacher(login).then(res => {
+    await checkTeacher(login).then(res => {
         regRes = res;
     });
 
-    if (regRes === false) {
+    if (regRes === true) {
         regRes = await addTeacher(login, password);
+        console.log("HereT")
     }
-
     return regRes;
 }
 
-async function studentRegister(login, password, name, surname, groupID) {
+async function studentRegister(login, password, name, surname, groupName) {
     let regRes = false;
+    let group  = -1;
 
-    checkStudent(login).then(res => {
+    await checkStudent(login).then(res => {
         regRes = res;
     });
 
+    await getGroupIDbyNumber(groupName).then(res => {
+        group = res;
+    });
+    console.log(regRes, group)
     if (regRes === false) {
-        regRes = await addStudent(login, password, name, surname, groupID);
+        regRes = await addStudent(login, password, name, surname, group);
     }
 
     return regRes;
@@ -75,14 +79,14 @@ function checkStudent(login) {
 
     return new Promise((resolve, reject) => {
         db.all(sql, [login], (err, row) => {
-            let res = false;
+            let res = true;
 
             if (err) {
                 reject(err);
             }
 
             if (row.length === 0) {
-                res = true;
+                res = false;
             }
 
             resolve(res);
@@ -112,7 +116,7 @@ function addStudent(login, password, name, surname, groupID) {
     return new Promise((resolve, reject) => {
         let res = false;
 
-        db.run('INSERT INTO Teacher(Name, Surname, GroupID, Login, Password) VALUES (?, ?, ?, ?, ?)', [name, surname, groupID, login, password], function(err) {
+        db.run('INSERT INTO Student(Name, Surname, GroupID, Login, Password) VALUES (?, ?, ?, ?, ?)', [name, surname, groupID, login, password], function(err) {
             if (err) {
                 console.log(err.message);
                 resolve(res)
@@ -124,13 +128,13 @@ function addStudent(login, password, name, surname, groupID) {
     });
 }
 
-// login (0 - если ошибка или не совпадает логин или пароль, 1 - если успешно, 2 - если такой пользователь уже есть)
+// login (0 - Ошибка надо тестить , 1 - если такого нет , 2 - если такой пользователь есть)
 function login(Login, Password) {
     return new Promise((resolve, reject) => {
         db.all('SELECT Login, Password FROM Teacher WHERE Login = (?) and Password = (?)', [Login, Password], (err, row) => {
             let res = 0;
             if (err) {
-                console.log(err.message)
+                console.log(err.message);
                 resolve(res);
             }
 
@@ -146,23 +150,16 @@ function login(Login, Password) {
 }
 // Добавление класса учителем
 function addClass(classNumber, login) {
-
-<<<<<<< HEAD
-=======
-    let teacherID = getTeacherIDByLogin(login);
->>>>>>> master
-
     return new Promise((resolve, reject) => {
 
         let res = false;
 
-<<<<<<< HEAD
         getTeacherIDByLogin(login).then(tmpRes => {
             teacherID = tmpRes;
         });
 
-=======
->>>>>>> master
+
+
         db.run('INSERT INTO Class(Number, TeacherID) VALUES (?, ?) ', [classNumber, teacherID], (err) => {
             if (err) {
                 console.log(err.message);
@@ -194,9 +191,78 @@ function addLesson(groupID, teacherID, date) {
     });
 }
 
+async function getCountOfLessonsByGroup(groupID) {
+
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT ID FROM Lesson WHERE GroupID = (?)";
+        let res = [];
+
+        db.all(sql, [groupID], (err, rows) => {
+
+            if (rows) {
+                rows.forEach(row => {
+                    res.push(row)
+                });
+            }
+
+            resolve(res.length);
+
+        });
+    });
+}
+
+async function getCountOfLessonsByStudent(login) {
+
+    let studentID = -1;
+
+    await getStudentIDByLogin(login).then(res => {
+        studentID = res;
+    });
+
+    return new Promise((resolve, reject) => {
+
+        let sql = "SELECT LessonID FROM Attendance WHERE StudentID = (?)";
+        let res = [];
+
+        db.all(sql, [studentID], (err, rows) => {
+
+            if (rows) {
+                rows.forEach(row => {
+                    res.push(row)
+                });
+            }
+
+            resolve(res.length);
+
+        });
+
+    });
+}
+
+function getStudentIDByLogin(login) {
+    return new Promise((resolve, reject) => {
+
+        let sql = "SELECT ID FROM Student WHERE Login = (?)";
+        let res = 0;
+
+        db.get(sql, [login], (err, row) => {
+
+            if (err) {
+                console.log(err.message);
+                resolve(res);
+            }
+
+
+            res = row.ID;
+            resolve(res);
+        });
+
+
+    });
+}
+
 function getTeacherIDByLogin(login) {
-<<<<<<< HEAD
-    console.log(login);
+    // console.log(login);
     let sql = "SELECT ID FROM Teacher Where Login = (?)";
 
     return new Promise((resolve, reject) => {
@@ -214,27 +280,6 @@ function getTeacherIDByLogin(login) {
     });
     
 }
-
-=======
-    
-    let sql = "SELECT ID FROM Teacher WHERE Login = (?)";
-    
-    return new Promise((resolve, reject) => {
-        
-        db.run(sql, [login], function (err, row) {
-            if (err) {
-                console.log(err.message);
-                resolve(null)
-            }
-
-            resolve(row.ID);
-        });
-        
-    });
-    
-}
-
->>>>>>> master
 // вернет пустой массив если нихуя нет или ошибка, или вернет массив данных студентов
 function getStudentsByGroup(number) {
     return new Promise((resolve, reject) => {
@@ -282,6 +327,7 @@ function getGroupsByTeacher(login) {
 }
 
 function getGroupIDbyNumber(number) {
+    console.log('getGroupIDbyNumber: ' + number);
     return new Promise((resolve, reject) => {
         let sql = "SELECT ID FROM Class WHERE Number = (?)";
 
@@ -295,34 +341,6 @@ function getGroupIDbyNumber(number) {
         });
 
 
-    });
-}
-
-function addStudent(name, surname, zoom, groupNumber) {
-    return new Promise((resolve, reject) => {
-        let check = false;
-        let gRes = 0;
-
-        getGroupIDbyNumber(groupNumber).then(res => {
-            if (res > 0) {
-                check = true;
-                gRes = res;
-            }
-            if (check === true) {
-                let sql = "INSERT INTO Student (Name, Surname, Zoom, GroupID) VALUES (?, ?, ?, ?)";
-                let res = false;
-
-                db.run(sql, [name, surname, zoom, gRes], (err) => {
-                    if (err) {
-                        console.log(err.message);
-                        resolve(res);
-                    }
-
-                    res = true;
-                    resolve(res);
-                });
-            }
-        });
     });
 }
 
@@ -506,7 +524,6 @@ module.exports = {
     db,
     login,
     teacherRegister,
-    studentRegister,
     addClass,
     addLesson,
     getStudentsByGroup,
@@ -518,6 +535,9 @@ module.exports = {
     getStudentsAttendance,
     getGroupAttendance,
     getGroupIDbyNumber,
-    studentRegister
+    studentRegister,
+    getCountOfLessonsByGroup,
+    getCountOfLessonsByStudent,
+
 };
 

@@ -35,62 +35,40 @@ function refresh_gr() {
 		fetch(`/table_gr_GET`, {method: 'GET', credentials: 'include'})
 		.then(response => response.json())
 		.then(groups => {
-			window.currentGroup = groups[0];
-			const dropdownMenu = document.querySelector(".dropdown-menu")
-			dropdownMenu.innerHTML = "";
-			groups.forEach(el => {
-			  let element = document.createElement("a");
-			  element.classList.add("dropdown-item");
-			  element.href = "#";
-			  element.onclick = () => {
-			    window.currentGroup = el;
-			    refresh();
-			  }
-			  element.innerText = `Группа ${el.Number}`
-			  dropdownMenu.append(element);
-			})  
-			// space-line
-			element = document.createElement("div");
-			element.classList.add("dropdown-divider");
-			dropdownMenu.append(element);
-
-			// input line
-			element = document.createElement("input");
-			element.classList.add("form-control");
-			element.classList.add("bar_func");
-			element.classList.add("m-b10px");
-			element.classList.add("m-t10px");
-			dropdownMenu.append(element);
-
-			// button Add
-			element = document.createElement("button");
-<<<<<<< HEAD
-			element.classList.add("invertBtn");
-			element.classList.add("ml-2");
-=======
-			/*element.classList.add("btn");
-			element.classList.add("btn-success");
-			element.classList.add("ml-17p");
-			element.classList.add("bar_func");*/
->>>>>>> master
-			element.type = 'button'
-			element.onclick = Add_Group
-			element.innerText = `Add Group`
-			dropdownMenu.append(element);
-
+			window.currentGroup = groups[0].Number;
+			const dropdownMenu = document.querySelector(".dropdown-menu > div")
+			if (dropdownMenu) {
+				dropdownMenu.innerHTML = "";
+				groups.forEach(el => {
+					let element = document.createElement("a");
+					element.classList.add("dropdown-item");
+					element.href = "#";
+					element.onclick = () => {
+						window.currentGroup = el.Number;
+						refresh();
+					}
+					element.innerText = `Группа ${el.Number}`;
+					// element.dataset.number = el.Number
+					dropdownMenu.append(element);
+				})
+				// space-line
+				element = document.createElement("div");
+				element.classList.add("dropdown-divider");
+				dropdownMenu.append(element);
+			}
 			resolve()
 		})
 	})
 }
 
 function refresh() {
-	fetch(`/table_GET?group_num=${window.currentGroup.Number}`, {method: 'GET', credentials: 'include'})
+	fetch(`/table_GET?group_num=${window.currentGroup}`, {method: 'GET', credentials: 'include'})
 	.then(response => response.json())
 	.then(json => {
-		const tbody = document.getElementById('tbody')
-		const group_num = document.getElementById('gr_num')
+		const tbody = document.getElementById('tbody_stat')
+		const group_num = document.getElementById('gr_num2')
 		tbody.innerHTML = ``
-		group_num.innerHTML = `№${window.currentGroup.Number}`
+		group_num.innerHTML = `№${window.currentGroup}`
 		json.forEach((el, idx) => {
 			tbody.innerHTML += `
 				<tr>
@@ -104,13 +82,13 @@ function refresh() {
 }
 
 function statsStudents() {
-	fetch(`/statsStudents?group_num=${window.currentGroup.Number}`, {method: 'GET', credentials: 'include'})
+	fetch(`/statsStudents?group_num=${window.currentGroup}`, {method: 'GET', credentials: 'include'})
 	.then(response => response.json())
 	.then(json => {
 		const tbody = document.getElementById('tbody_stat')
 		const group_num = document.getElementById('gr_num2')
 		tbody.innerHTML = ``
-		group_num.innerHTML = `№${window.currentGroup.Number}`
+		group_num.innerHTML = `№${window.currentGroup}`
 		json.forEach((el, idx) => {
 			tbody.innerHTML += `
 				<tr>
@@ -121,6 +99,20 @@ function statsStudents() {
 		})
 		console.log(tbody.innerHTML)
 	})
+}
+
+function studentStat() {
+	let curStat = document.getElementById('curEn')
+	let digitStat = document.getElementById('digitStat')
+	fetch(`/studentStat?group_num=${window.currentGroup}`, { method: 'GET', credentials: 'include' })
+	.then(response => response.json())
+	.then( json => {
+		let curWidth = json.stat
+
+		curStat.style.width = (98 * curWidth) + '%';
+		digitStat.textContent = curWidth.toFixed(3) * 100 + '%'
+	} )
+	return 0
 }
 
 function statsGroups() {
@@ -156,35 +148,50 @@ function create_link() {
 }
 
 function Add_Group() {
-	fetch('/AddGr', {method: 'POST', 
+	fetch('/AddGr', {method: 'POST',
 		credentials: 'include',
-		body: JSON.stringify({groupNum: document.querySelector('#navbarSupportedContent > ul > li > div > input').value})
+		body: JSON.stringify({groupNum: document.getElementById('grAddInput').value})
 		})
 	.then(response => response.json())
 	.then(json => {
 		refresh_gr()
-		// document.getElementById('link').value = window.location.origin + text
 	})
+}
+
+function Add_Student() {
+	fetch('/AddSt', {method: 'POST',
+		credentials: 'include',
+		body: JSON.stringify({
+			login: document.getElementById('login').value,
+			password: document.getElementById('password').value,
+			name: document.getElementById('name').value,
+			surname: document.getElementById('surname').value,
+			groupID: document.getElementById('group').value
+		})})
+	.then(response => response.json())
 }
 
 // запуск refresha при загрузке страницы
 window.onload = () => {
 	refresh_gr().then(refresh).then(statsStudents)
 	document.querySelector(".login").innerHTML = parseCookies().login
-	
+	if (document.getElementById('grAddButton')) {
+		document.getElementById('grAddButton').onclick = Add_Group
+	}
 }
 // время от времени (1,5 мин) обновляет данные
-// setInterval(refresh, 90000)
 setInterval(refresh_gr, 10000)
 setInterval(() => {
 	const cR1 = document.getElementById('customRadio1')
 	const cR2 = document.getElementById('customRadio2')
 
-	if (cR1.checked) {
-		statsStudents()
-	}
-	else{
-		statsGroups()
+	if (cR1) {
+		if (cR1.checked) {
+			statsStudents()
+		}
+		else{
+			statsGroups()
+		}
 	}
 	//if (cR1.ch)
 }, 10000)

@@ -15,6 +15,7 @@ const html_reg = fs.readFileSync('src/static/reg.html')
 const html_main = fs.readFileSync('src/static/main.html')
 const html_link = fs.readFileSync('src/static/link_midl.html')
 const html_admin = fs.readFileSync('src/static/html_admin.html')
+const html_student = fs.readFileSync('src/static/html_student.html')
 
 const css = fs.readFileSync('src/static/css/style.css')
 const js = fs.readFileSync('src/static/js/action.js')
@@ -59,6 +60,7 @@ const server = http.createServer(async (req, res) => {
     const cookies = parseCookies(req);
 
     const urlObject = url.parse(req.url, true, false)
+    // console.log(urlObject)
 
     const login = cookies.login;
     const password = cookies.password;
@@ -126,21 +128,20 @@ const server = http.createServer(async (req, res) => {
 
                 req.on("end", async () => {
                     // Получили все данные, идём дальше
-
-                    // console.debug(postData)
-
                     // Парсим данные из POST запроса
                     var postDataObject = parsePost(postData)
 
-                    let login = postDataObject.login, password = postDataObject.password;
+                    let login = postDataObject.Login
+                    let password = postDataObject.Password;
 
-                    let success = await database.register(login, password); // Регистрируем пользователя и true/false используем как успешность
+                    let success = await database.teacherRegister(login, password); // Регистрируем пользователя и true/false используем как успешность
 
                     // Если успех - переадресуем на /main.html
                     if (success) {
                         console.debug("Успешная регистрация")
-                        res.setHeader('Location', '/main');
                         res.setHeader('Set-Cookie', [`login=${login}`, `password=${password}`]);
+                        res.setHeader('Location', '/main');
+                        console.debug("Вы зарегистрировались под лоигонм и паролем: " + login + " - " + password)
                         res.end("<script>location.href = \"/main\"</script>") // На всякий случай переадресация через JS
                     } else {  // Если не успех - возвращаем обратно
                         console.debug("Ошибка регистрации")
@@ -157,66 +158,17 @@ const server = http.createServer(async (req, res) => {
 
             // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
             if (2 !== await database.login(login, password)) {
-                console.debug("Неизвестный пользователь, выкидываем на логин")
+                console.debug("Неизвестный пользователь, выкидываем на логин");
                 res.writeHead(200, {'Location': '/', 'Content-Type': 'text/html'});
-                res.end("<script>location.href = \"/\"</script>") // На всякий случай переадресация через JS
+                res.end("<script>location.href = \"/\"</script>"); // На всякий случай переадресация через JS
                 break;
             }
 
             res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
             res.end(html_main)
-<<<<<<< HEAD
-=======
-
-            if (req.method === "POST") {
-                // Получаем данные POST запроса
-
-                let postData = "";
-
-                req.on("data", chunk => postData += chunk)
-
-                req.on("end", async () => {
-                    // Получили все данные, идём дальше
-
-                    console.debug(postData)
-
-                //     // Парсим данные из POST запроса
-                //     var postDataObject = parsePost(postData)
-                //
-                //     // Берём из них логин и пароль
-                //     let login = postDataObject.login, password = postDataObject.password;
-                //
-                //     // Чекаем логин
-                //     let result = await database.login(login, password);
-                //
-                //     let success = result === 2; // Если 2, значит такой юзер есть
-                //
-                //     // Если успех - переадресуем на /main.html
-                //     if (success) {
-                //         console.debug("Логин: успешно")
-                //         res.setHeader('Location', '/main.html');  // переадресация
-                //         res.setHeader('Set-Cookie', [`login=${login}`, `password=${password}`]);
-                //         res.end("<script>location.href = \"/main.html\"</script>") // На всякий случай переадресация через JS
-                //     } else {  // Если не успех - возвращаем обратно
-                //         console.debug("Логин: Не успешно")
-                //         res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
-                //         res.end(html_log);
-                //     }
-                // });
-                // break;
-            })}
-            break
-        case '/testPOST':
-            if (req.method !== 'POST') // Если не пост, шлём нахуй
-                break;
-            // Получаем данные POST запроса
-
-            let postData = "";
-
-            req.on("data", chunk => postData += chunk)
->>>>>>> master
 
             break
+
         case '/html_admin':
 
             // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
@@ -229,6 +181,21 @@ const server = http.createServer(async (req, res) => {
 
             res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
             res.end(html_admin)
+
+            break
+
+        case '/html_student':
+
+            // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
+            if (2 !== await database.login(login, password)) {
+                console.debug("Неизвестный пользователь, выкидываем на логин")
+                res.writeHead(200, {'Location': '/', 'Content-Type': 'text/html'});
+                res.end("<script>location.href = \"/\"</script>") // На всякий случай переадресация через JS
+                break;
+            }
+
+            res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
+            res.end(html_student)
 
             break
 
@@ -245,7 +212,6 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(200, {'Content-Type': 'text/json'})
 
             res.end(JSON.stringify(students_table))
-
 
             break
 
@@ -405,8 +371,6 @@ const server = http.createServer(async (req, res) => {
 
         case '/statsStudents':
 
-            const group = await database.getGroupIDbyNumber(urlObject.query.group_num);
-
             const studentStats = [];
             let students = await database.getStudentsByGroup(urlObject.query.group_num);
 
@@ -424,10 +388,22 @@ const server = http.createServer(async (req, res) => {
 
             break
 
+        case '/studentStat':
+
+            let studentLogin = cookies.login
+            const group = await database.getGroupIDbyNumber(urlObject.query.group_num);
+            const result = await database.getCountOfLessonsByStudent(studentLogin) / await database.getCountOfLessonsByGroup(group)
+
+            const studentStat = {stat: result}
+
+            res.writeHead(200, {'Content-Type': 'text/json'});
+            res.end(JSON.stringify(studentStat))
+
+            break
+
         case '/AddGr':
             if (req.method !== 'POST') // Если не пост, шлём нахуй
                 break;
-<<<<<<< HEAD
 
             let ngr_dataPOST = "";
 
@@ -460,28 +436,18 @@ const server = http.createServer(async (req, res) => {
                 // console.debug(postData)
 
                 // Парсим данные из POST запроса
-
                 var postDataObject = JSON.parse(nst_dataPOST)
                 console.log(postDataObject)
-                // const new_group = await database.studentRegister(postDataObject.groupNum, cookies.id)
-=======
-
-            let ngr_dataPOST = "";
-
-            req.on("data", chunk => ngr_dataPOST += chunk)
-            req.on("end", async () => {
-                // Получили все данные, идём дальше
-
-                // console.debug(postData)
-
-                // Парсим данные из POST запроса
-                var postDataObject = JSON.parse(ngr_dataPOST)
-                console.log(postDataObject)
-                const new_group = await database.addClass(postDataObject.groupNum, cookies.id)
->>>>>>> master
+                const new_student = await database.studentRegister(
+                    postDataObject.login,
+                    postDataObject.password,
+                    postDataObject.name,
+                    postDataObject.surname,
+                    postDataObject.groupID
+                )
 
                 res.writeHead(200, {'Content-Type': 'text/json'});
-                res.end(JSON.stringify(new_group))
+                res.end(JSON.stringify(new_student))
             });
             break
 
