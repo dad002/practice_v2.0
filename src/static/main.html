@@ -29,7 +29,7 @@
 		</li>
 	</ul>
 
-	<div class="login text-light float_right mr-2 mt-3">LOGIN</div>
+	<div class="login text-light float_right mr-2 mt-3" id="LOGIN">LOGIN</div>
 	<div class="mb-3 space1"></div>
 	<div class="my_table">
 		<table class="table text-light">
@@ -61,20 +61,32 @@
 	</div>
 
 	<div class="right-bar">
+		<div class="float-left">
+			<form method="POST" action="" class="text-light">
+				<div class="form-group">
+					<label for="data">Data of New Lesson</label>
+					<br>
+					<input type="text" id="data" class="form-control">
+				</div>
+				<button type="button" class="" onclick="Add_Lesson()">Add Lesson</button>
+			</form>
+		</div>
 		<div class="float_right text-light">
 			<div class="link-gen" style="height: 185px;">
 				<input class="form-control m-b10px" type="text" placeholder="Link here..." id="link_input">
 				<input id="link" class="form-control w-100p m-b10px" placeholder="Здесь будет ссылка" />
 				<button type="button" class="" onclick="create_link()">Gen Link</button>
-			</div>	
-			<a href="#" class="btn btn-info inline w-100p" style="margin-bottom: 10px">Statistic</a><br>
-			<div class="custom-control custom-radio">
-			  <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input" checked>
-			  <label class="custom-control-label" for="customRadio1">Students</label>
 			</div>
-			<div class="custom-control custom-radio">
-			  <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input">
-			  <label class="custom-control-label" for="customRadio2">Groups</label>
+			<button type="button" class="" onclick="AddLink()">SHARE</button>
+		</div>
+	</div>
+
+	<div class="footer">
+		<div id="toggle-block" class="hidden">
+			<button type="button" id="toggle-button" onclick="toggleFunction()"><div id="arrow" class="left-arrow"></div></button>
+			<div id="console-bar">
+				<div id="special-div"></div>
+				<div id="content"></div>
 			</div>
 		</div>
 	</div>

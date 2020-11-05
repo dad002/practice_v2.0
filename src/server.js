@@ -51,6 +51,8 @@ function parsePost(rc) {
     return list;
 }
 
+
+
 // async функция-обработчик запросов чтобы можно было юзать await
 const server = http.createServer(async (req, res) => {
     // свойства объекта req
@@ -77,8 +79,6 @@ const server = http.createServer(async (req, res) => {
                 req.on("end", async () => {
                     // Получили все данные, идём дальше
 
-                    // console.debug(postData)
-
                     // Парсим данные из POST запроса
                     var postDataObject = parsePost(postData)
 
@@ -86,19 +86,32 @@ const server = http.createServer(async (req, res) => {
                     let login = postDataObject.login, password = postDataObject.password;
 
                     // Чекаем логин
-                    let result = await database.login(login, password);
+                    let resultT = await database.loginT(login, password);
+                    let resultS = await database.loginS(login, password);
 
-                    let success = result === 2; // Если 2, значит такой юзер есть
+                    let successT = resultT === 2; // Если 2, значит такой юзер есть
+                    let successS = resultS ===2;
 
                     // Если успех - переадресуем на /main.html
-                    if (success) {
+                    if (successT || successS) {
                         console.debug("Логин: успешно")
-                        res.setHeader('Location', '/main');  // переадресация
                         res.setHeader('Set-Cookie', [`login=${login}`, `password=${password}`]);
-                        res.end("<script>location.href = \"/main\"</script>") // На всякий случай переадресация через JS
+                        if (login === 'admin') {
+                            res.setHeader('Location', '/html_admin');  // переадресация
+                            res.end("<script>location.href = \"/html_admin\"</script>") // На всякий случай переадресация через JS
+                        }
+                        else {
+                            if (successS) {
+                                res.setHeader('Location', '/html_student');
+                                res.end("<script>Location.href = \"/html_student\"</script>");
+                            } else {
+                                res.setHeader('Location', '/main');  // переадресация
+                                res.end("<script>location.href = \"/main\"</script>") // На всякий случай переадресация через JS
+                            }
+                        }
                     } else {  // Если не успех - возвращаем обратно
                         console.debug("Логин: Не успешно")
-                        res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
+                        res.writeHead(401, {'Content-Type': 'text/html', 'res-msg':'Err'}); // plain - в случае обычного текста
                         res.end(html_log);
                     }
                 });
@@ -120,7 +133,7 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(200, {'Content-Type': 'img'}); // plain - в случае обычного текста
             res.end(bg)
             break
-        case '/reg.html':  // Экран регистрации
+        case '/reg':  // Экран регистрации
             if (req.method === "POST") {
                 let postData = "";
 
@@ -157,11 +170,9 @@ const server = http.createServer(async (req, res) => {
         case '/main':
 
             // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
-            if (2 !== await database.login(login, password)) {
-                console.debug("Неизвестный пользователь, выкидываем на логин");
-                res.writeHead(200, {'Location': '/', 'Content-Type': 'text/html'});
-                res.end("<script>location.href = \"/\"</script>"); // На всякий случай переадресация через JS
-                break;
+            if (cookies.login === 'admin') {
+                res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
+                res.end(html_admin)
             }
 
             res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
@@ -172,7 +183,7 @@ const server = http.createServer(async (req, res) => {
         case '/html_admin':
 
             // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
-            if (2 !== await database.login(login, password) && !(await database.isAdmin(login))) {
+            if (2 !== await database.loginT(login, password) && !(await database.isAdmin(login))) {
                 console.debug("Неизвестный пользователь, выкидываем на логин")
                 res.writeHead(200, {'Location': '/', 'Content-Type': 'text/html'});
                 res.end("<script>location.href = \"/\"</script>") // На всякий случай переадресация через JS
@@ -187,11 +198,9 @@ const server = http.createServer(async (req, res) => {
         case '/html_student':
 
             // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
-            if (2 !== await database.login(login, password)) {
-                console.debug("Неизвестный пользователь, выкидываем на логин")
-                res.writeHead(200, {'Location': '/', 'Content-Type': 'text/html'});
-                res.end("<script>location.href = \"/\"</script>") // На всякий случай переадресация через JS
-                break;
+            if (cookies.login === 'admin') {
+                res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
+                res.end(html_admin)
             }
 
             res.writeHead(200, {'Content-Type': 'text/html'}); // plain - в случае обычного текста
@@ -217,8 +226,14 @@ const server = http.createServer(async (req, res) => {
 
         case '/table_gr_GET':
 
+            let resultT = await database.loginT(login, password);
+            let resultS = await database.loginS(login, password);
+
+            let successT = resultT === 2; // Если 2, значит такой юзер есть
+            let successS = resultS ===2;
+
             // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
-            if (2 !== await database.login(cookies.login, cookies.password)) {
+            if (successS || successT) {
                 res.writeHead(200, {'Location': '/', 'Content-Type': 'text/html'});
                 res.end("<script>location.href = \"/\"</script>") // На всякий случай переадресация через JS
                 break;
@@ -227,93 +242,23 @@ const server = http.createServer(async (req, res) => {
             const groups_table = await database.getGroupsByTeacher(cookies.login);
             res.writeHead(200, {'Content-Type': 'text/json'});
 
-            res.end(JSON.stringify(groups_table))
+            res.end(JSON.stringify(groups_table));
 
             break;
 
-        case '/link_midl.html':
-            if (cookies.id !== undefined) {
-                database.checkIn(cookies.id, urlObject.query.i)
-
-                res.statusCode = 200
-                res.setHeader("Content-Type", "text/html");
-                res.setHeader("Location", await database.getLinkByHash(urlObject.query.i))
-                res.end(`<script>window.location.href = "${await database.getLinkByHash(urlObject.query.i)}"</script>`)
-                break
-            }
-
-            console.debug("Not redirecting")
-
-            if (urlObject.query.test !== undefined) {
-                const user = {
-                    first_name: randomName.first(),
-                    last_name: randomName.last(),
-                    id: Math.round(Math.random() * 1000000000),
-                    group: await database.getGroupByLinkHash(cookies.i)
-                }
-
-                await database.addStudent(user.first_name, user.last_name, user.id, user.group)
-
-                res.setHeader("Set-Cookie", `id=${user.id}`)
-                res.statusCode = 200
-                res.setHeader("Content-Type", "text/html");
-                res.setHeader("Location", await database.getLinkByHash(cookies.i))
-                res.end(`<script>window.location.href = "${await database.getLinkByHash(cookies.i)}"</script>`)
-                break;
-            }
-
-            let accessToken;
-
-            if (urlObject.query.code) {
-                try {
-                    const response = await axios({
-                        url: "https://zoom.us/oauth/token",
-                        method: "POST",
-                        headers: {
-                            "Authorization": "Basic " + Buffer.from(`${ClientID}:${ClientSecret}`, "utf-8").toString("base64")
-                        },
-                        params: {
-                            grant_type: "authorization_code",
-                            code: urlObject.query.code,
-                            redirect_uri: redirect_uri
-                        }
-                    })
-                    const data = response.data
-                    accessToken = data.access_token;
-                } catch (err) {
-                    console.error(err)
-                }
-
-                const resp = await axios({
-                    url: "https://api.zoom.us/v2/users/me",
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`
-                    }
-                })
-                const data = resp.data;
-
-                const user = {
-                    first_name: data.first_name,
-                    last_name: data.last_name,
-                    id: data.id,
-                    group: await database.getGroupByLinkHash(cookies.i)
-                }
-
-                await database.addStudent(user.first_name, user.last_name, user.id, user.group)
-
-                res.setHeader("Set-Cookie", `id=${data.id}`)
-                res.statusCode = 200
-                res.setHeader("Content-Type", "text/html");
-                res.setHeader("Location", await database.getLinkByHash(cookies.i))
-                res.end(`<script>window.location.href = "${await database.getLinkByHash(cookies.i)}"</script>`)
-                break;
-            }
+        case '/link_midl':
+            let studentID = -1
+            await database.getStudentIDByLogin(cookies.login)
+            .then(res => {
+                studentID = res
+            })
+            console.log("LinkMiddle: " + studentID + ", " + urlObject.query.group_num)
+            database.addAtt(studentID, urlObject.query.group_num)
 
             res.statusCode = 200
             res.setHeader("Content-Type", "text/html");
-            res.setHeader("Set-Cookie", `i=${urlObject.query.i}`)
-            res.end(html_link)
+            res.setHeader("Location", await database.showHashLink(urlObject.query.group_num))
+            res.end(`<script>window.location.href = "${await database.showHashLink(urlObject.query.group_num)}"</script>`)
             break
 
         case '/create_link':
@@ -331,12 +276,12 @@ const server = http.createServer(async (req, res) => {
 
                 // Парсим данные из POST запроса
                 var postDataObject = JSON.parse(postData_)
-
+                //
                 let start_hash = cookies.login + '_' + postDataObject.group
                 var hash = crypto.createHash('md5').update(start_hash).digest('hex');
-                let res_link = '/link_midl.html?i=' + hash
+                let res_link = '/link_midl?group_num=' + postDataObject.group + "&" + hash
 
-                await database.setLink(hash, postDataObject.link, postDataObject.group, cookies.login)
+                // await database.setLink(hash, postDataObject.link, postDataObject.group, cookies.login)
 
                 res.writeHead(200, {'Content-Type': 'text/plain'});
                 res.end(res_link)
@@ -385,6 +330,25 @@ const server = http.createServer(async (req, res) => {
 
             res.writeHead(200, {'Content-Type': 'text/json'});
             res.end(JSON.stringify(studentStats))
+
+            break
+
+        case '/statsAllStudents':
+
+            const statsAllStudents = [];
+            let allStudents = await database.getAllStudents();
+
+            for (let i = 0; i < allStudents.length; i++) {
+                let student = allStudents[i]
+                let attendance = (await database.getStudentsAttendance(student.ID))[0].Attendance;
+                statsAllStudents.push({
+                    Name: `${student.Name} ${student.Surname}`,
+                    Attendance: (attendance === null ? 0 : attendance) + '%'
+                })
+            }
+
+            res.writeHead(200, {'Content-Type': 'text/json'});
+            res.end(JSON.stringify(statsAllStudents))
 
             break
 
@@ -451,6 +415,73 @@ const server = http.createServer(async (req, res) => {
             });
             break
 
+        case '/AddLs':
+
+            if (req.method !== 'POST') // Если не пост, шлём нахуй
+                break;
+
+            let nls_dataPOST = "";
+
+            req.on("data", chunk => nls_dataPOST += chunk)
+            req.on("end", async () => {
+                // Получили все данные, идём дальше
+
+                // console.debug(postData)
+
+                // Парсим данные из POST запроса
+                var postDataObject = JSON.parse(nls_dataPOST)
+                console.log(postDataObject)
+                const new_lesson = await database.addLesson(
+                    await database.getGroupIDbyNumber(postDataObject.groupNameне ),
+                    await database.getTeacherIDByLogin(postDataObject.teacherLogin),
+                    postDataObject.date
+                );
+
+                res.writeHead(200, {'Content-Type': 'text/json'});
+                res.end(JSON.stringify(new_lesson))
+            });
+
+            break
+
+        case '/AddLink':
+            if (req.method !== 'POST') // Если не пост, шлём нахуй
+                break;
+
+            let nlink_dataPOST = "";
+
+            req.on("data", chunk => nlink_dataPOST += chunk)
+            req.on("end", async () => {
+                // Получили все данные, идём дальше
+
+                // Парсим данные из POST запроса
+                var postDataObject = JSON.parse(nlink_dataPOST)
+                // console.log(postDataObject)
+                const new_link = await database.addLink(
+                    postDataObject.hashlink,
+                    postDataObject.link,
+                    postDataObject.groupName,
+                    await database.getTeacherIDByLogin(postDataObject.teacherName)
+                )
+
+                res.writeHead(200, {'Content-Type': 'text/json'});
+                res.end(JSON.stringify(new_link))
+            })
+
+            break
+
+        case '/GetLink':
+
+            let link = "###"
+            await database.showLink(urlObject.query.group_num)
+            .then(res => {
+                link = res;
+            });
+
+            res.writeHead(200, {'Content-Type': 'text/json'});
+            res.end(JSON.stringify(link))
+
+            break
+
         default:
             res.writeHead(200, {'Content-Type': 'text/plain'});
             res.end(`<h1>Error 404: NOT FOUND</h1>`)
@@ -462,3 +493,85 @@ const server = http.createServer(async (req, res) => {
 // запуск веб-сервера
 
 
+            // if (cookies.id !== undefined) {
+            //     database.checkIn(cookies.id, urlObject.query.i)
+            //
+            //     res.statusCode = 200
+            //     res.setHeader("Content-Type", "text/html");
+            //     res.setHeader("Location", await database.getLinkByHash(urlObject.query.i))
+            //     res.end(`<script>window.location.href = "${await database.getLinkByHash(urlObject.query.i)}"</script>`)
+            //     break
+            // }
+            //
+            // console.debug("Not redirecting")
+            //
+            // if (urlObject.query.test !== undefined) {
+            //     const user = {
+            //         first_name: randomName.first(),
+            //         last_name: randomName.last(),
+            //         id: Math.round(Math.random() * 1000000000),
+            //         group: await database.getGroupByLinkHash(cookies.i)
+            //     }
+            //
+            //     await database.addStudent(user.first_name, user.last_name, user.id, user.group)
+            //
+            //     res.setHeader("Set-Cookie", `id=${user.id}`)
+            //     res.statusCode = 200
+            //     res.setHeader("Content-Type", "text/html");
+            //     res.setHeader("Location", await database.getLinkByHash(cookies.i))
+            //     res.end(`<script>window.location.href = "${await database.getLinkByHash(cookies.i)}"</script>`)
+            //     break;
+            // }
+            //
+            // let accessToken;
+            //
+            // if (urlObject.query.code) {
+            //     try {
+            //         const response = await axios({
+            //             url: "https://zoom.us/oauth/token",
+            //             method: "POST",
+            //             headers: {
+            //                 "Authorization": "Basic " + Buffer.from(`${ClientID}:${ClientSecret}`, "utf-8").toString("base64")
+            //             },
+            //             params: {
+            //                 grant_type: "authorization_code",
+            //                 code: urlObject.query.code,
+            //                 redirect_uri: redirect_uri
+            //             }
+            //         })
+            //         const data = response.data
+            //         accessToken = data.access_token;
+            //     } catch (err) {
+            //         console.error(err)
+            //     }
+            //
+            //     const resp = await axios({
+            //         url: "https://api.zoom.us/v2/users/me",
+            //         method: "GET",
+            //         headers: {
+            //             Authorization: `Bearer ${accessToken}`
+            //         }
+            //     })
+            //     const data = resp.data;
+            //
+            //     const user = {
+            //         first_name: data.first_name,
+            //         last_name: data.last_name,
+            //         id: data.id,
+            //         group: await database.getGroupByLinkHash(cookies.i)
+            //     }
+            //
+            //     await database.addStudent(user.first_name, user.last_name, user.id, user.group)
+            //
+            //     res.setHeader("Set-Cookie", `id=${data.id}`)
+            //     res.statusCode = 200
+            //     res.setHeader("Content-Type", "text/html");
+            //     res.setHeader("Location", await database.getLinkByHash(cookies.i))
+            //     res.end(`<script>window.location.href = "${await database.getLinkByHash(cookies.i)}"</script>`)
+            //     break;
+            // }
+            //
+            // res.statusCode = 200
+            // res.setHeader("Content-Type", "text/html");
+            // res.setHeader("Set-Cookie", `i=${urlObject.query.i}`)
+            // res.end(html_link)

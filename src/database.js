@@ -3,20 +3,6 @@ let Promise = require('bluebird');
 
 let db = new sqlite.Database('data.db');
 
-// Функция просто для тестирования
-function get() {
-    let sql = "SELECT * FROM Teacher";
-
-    db.all(sql, [], (err, rows) => {
-        if (err) {
-            throw err;
-        }
-        rows.forEach((row) => {
-            console.log(row);
-        });
-    });
-}
-
 // register (true - если успешно, false - если неуспешно)
 async function teacherRegister(login, password) {
     let regRes = false;
@@ -27,7 +13,6 @@ async function teacherRegister(login, password) {
 
     if (regRes === true) {
         regRes = await addTeacher(login, password);
-        console.log("HereT")
     }
     return regRes;
 }
@@ -43,7 +28,6 @@ async function studentRegister(login, password, name, surname, groupName) {
     await getGroupIDbyNumber(groupName).then(res => {
         group = res;
     });
-    console.log(regRes, group)
     if (regRes === false) {
         regRes = await addStudent(login, password, name, surname, group);
     }
@@ -129,7 +113,7 @@ function addStudent(login, password, name, surname, groupID) {
 }
 
 // login (0 - Ошибка надо тестить , 1 - если такого нет , 2 - если такой пользователь есть)
-function login(Login, Password) {
+function loginT(Login, Password) {
     return new Promise((resolve, reject) => {
         db.all('SELECT Login, Password FROM Teacher WHERE Login = (?) and Password = (?)', [Login, Password], (err, row) => {
             let res = 0;
@@ -148,17 +132,38 @@ function login(Login, Password) {
         });
     })
 }
+
+function loginS(Login, Password) {
+    return new Promise((resolve, reject) => {
+        db.all('SELECT Login, Password FROM Student WHERE Login = (?) and Password = (?)', [Login, Password], (err, row) => {
+            let res = 0;
+            if (err) {
+                console.log(err.message);
+                resolve(res);
+            }
+
+            if (row.length === 0) {
+                res = 1
+            } else {
+                res = 2
+            }
+
+            resolve(res)
+        });
+    })
+}
+
 // Добавление класса учителем
-function addClass(classNumber, login) {
+async function addClass(classNumber, login) {
+    let teacherID = -1;
+
+    await getTeacherIDByLogin(login).then(tmpRes => {
+        teacherID = tmpRes;
+    });
+
     return new Promise((resolve, reject) => {
 
         let res = false;
-
-        getTeacherIDByLogin(login).then(tmpRes => {
-            teacherID = tmpRes;
-        });
-
-
 
         db.run('INSERT INTO Class(Number, TeacherID) VALUES (?, ?) ', [classNumber, teacherID], (err) => {
             if (err) {
@@ -186,6 +191,137 @@ function addLesson(groupID, teacherID, date) {
             }
 
             res = true;
+            resolve(res);
+        });
+    });
+}
+
+// добавление сгенерированной ссылки
+async function addLink(hash, link, groupName, teacherID) {
+    let groupID = -1;
+
+    await getGroupIDbyNumber(groupName).then(res => {
+        groupID = res;
+    });
+
+    return new Promise((resolve, reject) => {
+
+        let res = false;
+
+        let sql = "INSERT INTO ZoomLinks (HashLink, Link, 'Group', Teacher) VALUES (?, ?, ?, ?)";
+        db.run(sql, [hash, link, groupID, teacherID], (err ,row) => {
+            if (err) {
+                console.log(err.message);
+                resolve(res);
+            }
+
+            res = true;
+            resolve(res);
+        });
+    });
+}
+
+async function addAtt(studentID, groupName) {
+    let groupID = -1;
+
+    await getGroupIDbyNumber(groupName).then(res => {
+        groupID = res;
+    });
+    return new Promise((resolve, reject) => {
+        let res = false;
+        let sql = "INSERT INTO Attendance (studentid, visited, groupid) values (?,?,?)";
+
+        db.get(sql, [studentID,true,groupID], (err, row) => {
+            if (err) {
+                resolve(res);
+            }
+            res = true;
+            resolve(res);
+        });
+    });
+}
+
+async function showLink(groupName) {
+
+    let groupID = -1;
+    let teacherID = -1;
+
+    await getGroupIDbyNumber(groupName).then(res => {
+        groupID = res;
+    });
+
+    await getTeacherIDByGroup(groupName).then(res => {
+        teacherID = res;
+    });
+
+    return new Promise((resolve, reject) => {
+        let res  = '';
+
+        let sql = `SELECT Link FROM ZoomLinks WHERE "Group" = (?) AND Teacher = (?)`;
+
+        db.get(sql, [groupID, teacherID], (err, row) => {
+
+
+            if (err) {
+                console.log(err.message);
+                resolve(res);
+            }
+
+            if (row === undefined) {
+                resolve(res)
+                return ''
+            }
+            // console.log(row)
+            res = row.Link;
+            resolve(res);
+        });
+    });
+}
+
+async function showHashLink(groupName) {
+
+    let groupID = -1;
+    let teacherID = -1;
+
+    await getGroupIDbyNumber(groupName).then(res => {
+        groupID = res;
+    });
+
+    await getTeacherIDByGroup(groupName).then(res => {
+        teacherID = res;
+    });
+
+    return new Promise((resolve, reject) => {
+        let res  = '';
+        let sql = `SELECT HashLink FROM ZoomLinks WHERE "Group" = (?) AND Teacher = (?)`;
+
+        db.get(sql, [groupID, teacherID], (err, row) => {
+
+            if (err) {
+                console.log(err.message);
+                resolve(res);
+            }
+
+            res = row.HashLink;
+            resolve(res);
+        });
+    });
+}
+
+function getTeacherIDByGroup(groupName) {
+    return new Promise((resolve, reject) => {
+        let res = -1;
+
+        let sql = "SELECT TeacherID FROM Class WHERE Number = (?)";
+
+        db.get(sql, [groupName], (err, row) => {
+
+            if (err) {
+                console.log(err);
+                resolve(res);
+            }
+
+            res = row.TeacherID;
             resolve(res);
         });
     });
@@ -240,6 +376,7 @@ async function getCountOfLessonsByStudent(login) {
 }
 
 function getStudentIDByLogin(login) {
+    console.log(login);
     return new Promise((resolve, reject) => {
 
         let sql = "SELECT ID FROM Student WHERE Login = (?)";
@@ -262,7 +399,6 @@ function getStudentIDByLogin(login) {
 }
 
 function getTeacherIDByLogin(login) {
-    // console.log(login);
     let sql = "SELECT ID FROM Teacher Where Login = (?)";
 
     return new Promise((resolve, reject) => {
@@ -327,7 +463,7 @@ function getGroupsByTeacher(login) {
 }
 
 function getGroupIDbyNumber(number) {
-    console.log('getGroupIDbyNumber: ' + number);
+    console.log(number);
     return new Promise((resolve, reject) => {
         let sql = "SELECT ID FROM Class WHERE Number = (?)";
 
@@ -479,6 +615,28 @@ function getTeacherByLinkHash(hashLink) {
     });
 }
 
+function getAllStudents() {
+
+    return new Promise((resolve) => {
+        let res = [];
+        let sql = "SELECT Name, Surname, Login, Password FROM Student";
+
+        db.all(sql, (err, rows) => {
+
+            if (err) {
+                console.log(err.message);
+                resolve(res);
+            }
+
+            rows.forEach(row => {
+                res.push(row);
+            });
+
+            resolve(res);
+        });
+    });
+}
+
 function getStudentsAttendance(studentID) {
     return new Promise ((resolve) => {
         // language=TEXT
@@ -522,22 +680,29 @@ function getGroupAttendance(groupID) {
 // Для того, чтобы можно было сделать require
 module.exports = {
     db,
-    login,
+    loginT,
+    loginS,
     teacherRegister,
     addClass,
     addLesson,
+    addLink,
+    addAtt,
     getStudentsByGroup,
     getGroupsByTeacher,
+    getStudentIDByLogin,
+    getAllStudents,
     setLink,
     getLinkByHash,
     getGroupByLinkHash,
     getTeacherByLinkHash,
+    getTeacherIDByLogin,
     getStudentsAttendance,
     getGroupAttendance,
     getGroupIDbyNumber,
     studentRegister,
     getCountOfLessonsByGroup,
     getCountOfLessonsByStudent,
-
+    showLink,
+    showHashLink,
 };
 

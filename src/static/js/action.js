@@ -5,17 +5,19 @@ function action() {
 	alert(cookies)
 }
 
-/*function addStudent() {
-	fetch('/AddSt', {method: 'POST',
-		credentials: 'include',
-		body: JSON.stringify({groupNum: document.querySelector('#navbarSupportedContent > ul > li > div > input').value})
-	})
-		.then(response => response.json())
-		.then(json => {
-			refresh_gr()
-			// document.getElementById('link').value = window.location.origin + text
-		})
-}*/
+function toggleFunction() {
+	let toggleBlock = document.getElementById('toggle-block')
+	toggleBlock.classList.toggle('hidden')
+	toggleBlock.classList.toggle('visible')
+	let arrow = document.getElementById('arrow')
+	arrow.classList.toggle('right-arrow')
+	arrow.classList.toggle('left-arrow')
+}
+
+function clientDebug(msg) {
+	let content = document.getElementById('content')
+	content.textContent += (msg + '\n')
+}
 
 function parseCookies() {
 	var list = {},
@@ -97,7 +99,24 @@ function statsStudents() {
 		      		<td>${el.Attendance}</td>
 			    </tr>			`
 		})
-		console.log(tbody.innerHTML)
+	})
+}
+
+function statsAllStudents() {
+	fetch(`/statsAllStudents`, {method: 'GET', credentials: 'include'})
+	.then(response => response.json())
+	.then(json => {
+		console.log(json)
+		const tbody = document.getElementById('tbody_stat')
+		tbody.innerHTML = ``
+		json.forEach((el, idx) => {
+			tbody.innerHTML += `
+				<tr>
+					<th scope="row">${idx + 1}</th>
+					<td>${el.Name}</td>
+					<td>${el.Attendance}</td>
+				</tr>			`
+		})
 	})
 }
 
@@ -113,26 +132,6 @@ function studentStat() {
 		digitStat.textContent = curWidth.toFixed(3) * 100 + '%'
 	} )
 	return 0
-}
-
-function statsGroups() {
-	fetch(`/statsGroup`, {method: 'GET', credentials: 'include'})
-	.then(response => response.json())
-	.then(json => {
-		const tbody = document.getElementById('tbody_stat')
-		tbody.innerHTML = ``
-		const group_num = document.getElementById('gr_num2')
-		group_num.innerHTML = `#`
-		json.forEach((el, idx) => {
-			tbody.innerHTML += `
-				<tr>
-		      		<th scope="row">${idx + 1}</th>
-		      		<td>${el.GroupID}</td>
-		      		<td>${el.Attendance}</td>
-			    </tr>
-			`
-		})
-	})
 }
 
 function create_link() {
@@ -171,27 +170,58 @@ function Add_Student() {
 	.then(response => response.json())
 }
 
+function Add_Lesson() {
+	fetch('/AddLs', {
+		method: 'POST',
+		credentials: 'include',
+		body: JSON.stringify({
+			groupName: window.currentGroup,
+			teacherLogin: document.getElementById('LOGIN').textContent,
+			date: document.getElementById('data').value.replace(/\s+/g, '')
+		})
+	})
+	.then(response => response.json())
+}
+
+function AddLink() {
+	fetch('/AddLink', {
+		method: 'POST',
+		credentials: 'include',
+		body: JSON.stringify({
+			hashlink: document.getElementById('link_input').value,
+			link: document.getElementById('link').value,
+			groupName: window.currentGroup,
+			teacherName: document.getElementById('LOGIN').textContent
+		})
+	})
+	.then(response => response.json())
+}
+
+function getLink() {
+	fetch(`/GetLink?group_num=${window.currentGroup}`, { method: 'GET', credentials: 'include' })
+	.then(response => response.json())
+	.then(json => {
+		document.getElementById('linkToCheck').value = json
+	})
+}
+
 // запуск refresha при загрузке страницы
 window.onload = () => {
-	refresh_gr().then(refresh).then(statsStudents)
+	refresh_gr().then(statsStudents)
 	document.querySelector(".login").innerHTML = parseCookies().login
 	if (document.getElementById('grAddButton')) {
 		document.getElementById('grAddButton').onclick = Add_Group
 	}
 }
 // время от времени (1,5 мин) обновляет данные
-setInterval(refresh_gr, 10000)
 setInterval(() => {
-	const cR1 = document.getElementById('customRadio1')
-	const cR2 = document.getElementById('customRadio2')
-
-	if (cR1) {
-		if (cR1.checked) {
-			statsStudents()
-		}
-		else{
-			statsGroups()
-		}
+	if (document.getElementById("linkToCheck").value === null) {
+		getLink()
 	}
-	//if (cR1.ch)
-}, 10000)
+	// if (document.getElementById("group").value !== null) {
+	// 	statsAllStudents()
+	// }
+}, 1000)
+setInterval(refresh_gr, 3000)
+setInterval(statsAllStudents, 3000)
+
