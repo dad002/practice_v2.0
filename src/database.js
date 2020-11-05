@@ -271,7 +271,6 @@ async function showLink(groupName) {
                 resolve(res)
                 return ''
             }
-            // console.log(row)
             res = row.Link;
             resolve(res);
         });
@@ -435,10 +434,6 @@ function getStudentsByGroup(number) {
             resolve(res)
         })
     });
-}
-
-async function getLinkByHash() {
-    return "https://google.com"
 }
 
 function getGroupsByTeacher(login) {
@@ -639,7 +634,6 @@ function getAllStudents() {
 
 function getStudentsAttendance(studentID) {
     return new Promise ((resolve) => {
-        // language=TEXT
         let sql = 'SELECT CAST((SELECT CAST(COUNT(*) as float) CNT\n             FROM Student\n                      JOIN Attendance on Student.ID = Attendance.StudentID\n             WHERE StudentID = (?)\n             GROUP BY StudentID\n             LIMIT 1) / (SELECT CAST(COUNT(L.ID) as float) CNTALL\n                         FROM Student\n                                  JOIN Lesson L on Student.GroupID = L.GroupID\n                         WHERE Student.ID = (?)\n                         GROUP BY Student.ID\n                         LIMIT 1) * 100 as integer) Attendance;';
         let res = [];
 

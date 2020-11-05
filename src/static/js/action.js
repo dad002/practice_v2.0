@@ -218,10 +218,17 @@ setInterval(() => {
 	if (document.getElementById("linkToCheck").value === null) {
 		getLink()
 	}
-	// if (document.getElementById("group").value !== null) {
-	// 	statsAllStudents()
-	// }
 }, 1000)
-setInterval(refresh_gr, 3000)
-setInterval(statsAllStudents, 3000)
+setInterval( () => {
+	console.log(document.getElementsByClassName("LOGIN")[0])
+	if (document.getElementsByClassName("LOGIN")[0].textContent === "admin") {
+		statsAllStudents()
+	}
+}, 1500)
+setInterval(() => {
+	console.log(document.getElementsByClassName("LOGIN")[0].textContent)
+	if (document.getElementsByClassName("LOGIN")[0].textContent !== "admin") {
+		refresh_gr()
+	}
+}, 1500)
 

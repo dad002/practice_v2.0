@@ -36,10 +36,6 @@ body {
     margin-left: 36%;
 }
 
-.login {
-    width: 3em;
-}
-
 .my_table {
     float: left;
     width: 35%;
@@ -255,7 +251,3 @@ input.form-control {
     background-color: rgba(170, 170, 170, 0.8);
     background:linear-gradient(135deg, transparent 20px, rgba(170, 170, 170, 0.8) 0);
 }
-
-/*#linkToCheck {
-    width: 60%;
-}*/

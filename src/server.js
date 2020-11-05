@@ -22,10 +22,6 @@ const js = fs.readFileSync('src/static/js/action.js')
 
 const bg = fs.readFileSync('src/img/bg.jpg')
 
-const ClientID = 'sOOeFevFTcqagteoLkNYsg'
-const ClientSecret = 'yRqRLVV5jR35FS71aNuM7QVEZsWrmdQf'
-const redirect_uri = "https://127.0.0.1:5000/link_midl.html"
-
 // Парсить куки
 function parseCookies(request) {
     var list = {},
@@ -57,12 +53,10 @@ function parsePost(rc) {
 const server = http.createServer(async (req, res) => {
     // свойства объекта req
     console.log(`${req.method} ${req.url}`);
-    // console.log(req.headers);
 
     const cookies = parseCookies(req);
 
     const urlObject = url.parse(req.url, true, false)
-    // console.log(urlObject)
 
     const login = cookies.login;
     const password = cookies.password;
@@ -90,7 +84,7 @@ const server = http.createServer(async (req, res) => {
                     let resultS = await database.loginS(login, password);
 
                     let successT = resultT === 2; // Если 2, значит такой юзер есть
-                    let successS = resultS ===2;
+                    let successS = resultS === 2;
 
                     // Если успех - переадресуем на /main.html
                     if (successT || successS) {
@@ -230,14 +224,9 @@ const server = http.createServer(async (req, res) => {
             let resultS = await database.loginS(login, password);
 
             let successT = resultT === 2; // Если 2, значит такой юзер есть
-            let successS = resultS ===2;
+            let successS = resultS === 2;
 
             // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
-            if (successS || successT) {
-                res.writeHead(200, {'Location': '/', 'Content-Type': 'text/html'});
-                res.end("<script>location.href = \"/\"</script>") // На всякий случай переадресация через JS
-                break;
-            }
 
             const groups_table = await database.getGroupsByTeacher(cookies.login);
             res.writeHead(200, {'Content-Type': 'text/json'});
@@ -263,7 +252,7 @@ const server = http.createServer(async (req, res) => {
 
         case '/create_link':
 
-            if (req.method !== 'POST') // Если не пост, шлём нахуй
+            if (req.method !== 'POST')
                 break;
 
             let postData_ = "";
@@ -280,8 +269,6 @@ const server = http.createServer(async (req, res) => {
                 let start_hash = cookies.login + '_' + postDataObject.group
                 var hash = crypto.createHash('md5').update(start_hash).digest('hex');
                 let res_link = '/link_midl?group_num=' + postDataObject.group + "&" + hash
-
-                // await database.setLink(hash, postDataObject.link, postDataObject.group, cookies.login)
 
                 res.writeHead(200, {'Content-Type': 'text/plain'});
                 res.end(res_link)
@@ -366,7 +353,7 @@ const server = http.createServer(async (req, res) => {
             break
 
         case '/AddGr':
-            if (req.method !== 'POST') // Если не пост, шлём нахуй
+            if (req.method !== 'POST')
                 break;
 
             let ngr_dataPOST = "";
@@ -374,8 +361,6 @@ const server = http.createServer(async (req, res) => {
             req.on("data", chunk => ngr_dataPOST += chunk)
             req.on("end", async () => {
                 // Получили все данные, идём дальше
-
-                // console.debug(postData)
 
                 // Парсим данные из POST запроса
                 var postDataObject = JSON.parse(ngr_dataPOST)
@@ -388,7 +373,7 @@ const server = http.createServer(async (req, res) => {
             break
 
         case '/AddSt':
-            if (req.method !== 'POST') // Если не пост, шлём нахуй
+            if (req.method !== 'POST')
                 break;
 
             let nst_dataPOST = "";
@@ -396,8 +381,6 @@ const server = http.createServer(async (req, res) => {
             req.on("data", chunk => nst_dataPOST += chunk)
             req.on("end", async () => {
                 // Получили все данные, идём дальше
-
-                // console.debug(postData)
 
                 // Парсим данные из POST запроса
                 var postDataObject = JSON.parse(nst_dataPOST)
@@ -417,7 +400,7 @@ const server = http.createServer(async (req, res) => {
 
         case '/AddLs':
 
-            if (req.method !== 'POST') // Если не пост, шлём нахуй
+            if (req.method !== 'POST')
                 break;
 
             let nls_dataPOST = "";
@@ -425,8 +408,6 @@ const server = http.createServer(async (req, res) => {
             req.on("data", chunk => nls_dataPOST += chunk)
             req.on("end", async () => {
                 // Получили все данные, идём дальше
-
-                // console.debug(postData)
 
                 // Парсим данные из POST запроса
                 var postDataObject = JSON.parse(nls_dataPOST)
@@ -444,7 +425,7 @@ const server = http.createServer(async (req, res) => {
             break
 
         case '/AddLink':
-            if (req.method !== 'POST') // Если не пост, шлём нахуй
+            if (req.method !== 'POST')
                 break;
 
             let nlink_dataPOST = "";
@@ -455,7 +436,6 @@ const server = http.createServer(async (req, res) => {
 
                 // Парсим данные из POST запроса
                 var postDataObject = JSON.parse(nlink_dataPOST)
-                // console.log(postDataObject)
                 const new_link = await database.addLink(
                     postDataObject.hashlink,
                     postDataObject.link,
@@ -490,88 +470,3 @@ const server = http.createServer(async (req, res) => {
 }).listen(port, () => console.log(`Сервер запущен: http://` +
     `${server.address().address === "::" ? "localhost" : server.address().address}:${server.address().port}`
 ));
-// запуск веб-сервера
-
-
-            // if (cookies.id !== undefined) {
-            //     database.checkIn(cookies.id, urlObject.query.i)
-            //
-            //     res.statusCode = 200
-            //     res.setHeader("Content-Type", "text/html");
-            //     res.setHeader("Location", await database.getLinkByHash(urlObject.query.i))
-            //     res.end(`<script>window.location.href = "${await database.getLinkByHash(urlObject.query.i)}"</script>`)
-            //     break
-            // }
-            //
-            // console.debug("Not redirecting")
-            //
-            // if (urlObject.query.test !== undefined) {
-            //     const user = {
-            //         first_name: randomName.first(),
-            //         last_name: randomName.last(),
-            //         id: Math.round(Math.random() * 1000000000),
-            //         group: await database.getGroupByLinkHash(cookies.i)
-            //     }
-            //
-            //     await database.addStudent(user.first_name, user.last_name, user.id, user.group)
-            //
-            //     res.setHeader("Set-Cookie", `id=${user.id}`)
-            //     res.statusCode = 200
-            //     res.setHeader("Content-Type", "text/html");
-            //     res.setHeader("Location", await database.getLinkByHash(cookies.i))
-            //     res.end(`<script>window.location.href = "${await database.getLinkByHash(cookies.i)}"</script>`)
-            //     break;
-            // }
-            //
-            // let accessToken;
-            //
-            // if (urlObject.query.code) {
-            //     try {
-            //         const response = await axios({
-            //             url: "https://zoom.us/oauth/token",
-            //             method: "POST",
-            //             headers: {
-            //                 "Authorization": "Basic " + Buffer.from(`${ClientID}:${ClientSecret}`, "utf-8").toString("base64")
-            //             },
-            //             params: {
-            //                 grant_type: "authorization_code",
-            //                 code: urlObject.query.code,
-            //                 redirect_uri: redirect_uri
-            //             }
-            //         })
-            //         const data = response.data
-            //         accessToken = data.access_token;
-            //     } catch (err) {
-            //         console.error(err)
-            //     }
-            //
-            //     const resp = await axios({
-            //         url: "https://api.zoom.us/v2/users/me",
-            //         method: "GET",
-            //         headers: {
-            //             Authorization: `Bearer ${accessToken}`
-            //         }
-            //     })
-            //     const data = resp.data;
-            //
-            //     const user = {
-            //         first_name: data.first_name,
-            //         last_name: data.last_name,
-            //         id: data.id,
-            //         group: await database.getGroupByLinkHash(cookies.i)
-            //     }
-            //
-            //     await database.addStudent(user.first_name, user.last_name, user.id, user.group)
-            //
-            //     res.setHeader("Set-Cookie", `id=${data.id}`)
-            //     res.statusCode = 200
-            //     res.setHeader("Content-Type", "text/html");
-            //     res.setHeader("Location", await database.getLinkByHash(cookies.i))
-            //     res.end(`<script>window.location.href = "${await database.getLinkByHash(cookies.i)}"</script>`)
-            //     break;
-            // }
-            //
-            // res.statusCode = 200
-            // res.setHeader("Content-Type", "text/html");
-            // res.setHeader("Set-Cookie", `i=${urlObject.query.i}`)
-            // res.end(html_link)
