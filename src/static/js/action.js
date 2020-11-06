@@ -176,11 +176,11 @@ function Add_Lesson() {
 		credentials: 'include',
 		body: JSON.stringify({
 			groupName: window.currentGroup,
-			teacherLogin: document.getElementById('LOGIN').textContent,
+			teacherLogin: document.getElementsByClassName('LOGIN')[0].textContent,
 			date: document.getElementById('data').value.replace(/\s+/g, '')
 		})
 	})
-	.then(response => response.json())
+		.then(response => response.json())
 }
 
 function AddLink() {
@@ -191,10 +191,10 @@ function AddLink() {
 			hashlink: document.getElementById('link_input').value,
 			link: document.getElementById('link').value,
 			groupName: window.currentGroup,
-			teacherName: document.getElementById('LOGIN').textContent
+			teacherName: document.getElementsByClassName('LOGIN')[0].textContent
 		})
 	})
-	.then(response => response.json())
+		.then(response => response.json())
 }
 
 function getLink() {
@@ -208,25 +208,27 @@ function getLink() {
 // запуск refresha при загрузке страницы
 window.onload = () => {
 	refresh_gr().then(statsStudents)
+	.then( () => { if (document.getElementById("linkToCheck").textContent === "") { studentStat() } } )
 	document.querySelector(".login").innerHTML = parseCookies().login
 	if (document.getElementById('grAddButton')) {
 		document.getElementById('grAddButton').onclick = Add_Group
 	}
+
+
+
 }
 // время от времени (1,5 мин) обновляет данные
 setInterval(() => {
-	if (document.getElementById("linkToCheck").value === null) {
+	if (document.getElementById("linkToCheck").textContent === "") {
 		getLink()
 	}
 }, 1000)
 setInterval( () => {
-	console.log(document.getElementsByClassName("LOGIN")[0])
 	if (document.getElementsByClassName("LOGIN")[0].textContent === "admin") {
 		statsAllStudents()
 	}
 }, 1500)
 setInterval(() => {
-	console.log(document.getElementsByClassName("LOGIN")[0].textContent)
 	if (document.getElementsByClassName("LOGIN")[0].textContent !== "admin") {
 		refresh_gr()
 	}

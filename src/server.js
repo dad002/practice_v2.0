@@ -89,16 +89,18 @@ const server = http.createServer(async (req, res) => {
                     // Если успех - переадресуем на /main.html
                     if (successT || successS) {
                         console.debug("Логин: успешно")
-                        res.setHeader('Set-Cookie', [`login=${login}`, `password=${password}`]);
+                        res.setHeader('Set-Cookie', [`login=${login}`, `password=${password}`, `type=${successT ? 'teacher' : 'student'}`]);
                         if (login === 'admin') {
                             res.setHeader('Location', '/html_admin');  // переадресация
                             res.end("<script>location.href = \"/html_admin\"</script>") // На всякий случай переадресация через JS
                         }
                         else {
                             if (successS) {
+                                console.log("You're student")
                                 res.setHeader('Location', '/html_student');
-                                res.end("<script>Location.href = \"/html_student\"</script>");
+                                res.end("<script>location.href = \"/html_student\"</script>");
                             } else {
+                                console.log("You're teacher")
                                 res.setHeader('Location', '/main');  // переадресация
                                 res.end("<script>location.href = \"/main\"</script>") // На всякий случай переадресация через JS
                             }
@@ -220,15 +222,16 @@ const server = http.createServer(async (req, res) => {
 
         case '/table_gr_GET':
 
-            let resultT = await database.loginT(login, password);
-            let resultS = await database.loginS(login, password);
-
-            let successT = resultT === 2; // Если 2, значит такой юзер есть
-            let successS = resultS === 2;
-
             // Проверяем, правильные ли логин и пароль. Если нет - выкидываем на страницу логина
 
-            const groups_table = await database.getGroupsByTeacher(cookies.login);
+            let groups_table
+            if (cookies.type === 'teacher') {
+                groups_table = await database.getGroupsByTeacher(cookies.login);
+            }
+            else {
+                groups_table = await database.getGroupsByStudent(cookies.login);
+            }
+            /*console.log(groups_table)*/
             res.writeHead(200, {'Content-Type': 'text/json'});
 
             res.end(JSON.stringify(groups_table));
@@ -413,7 +416,7 @@ const server = http.createServer(async (req, res) => {
                 var postDataObject = JSON.parse(nls_dataPOST)
                 console.log(postDataObject)
                 const new_lesson = await database.addLesson(
-                    await database.getGroupIDbyNumber(postDataObject.groupNameне ),
+                    await database.getGroupIDbyNumber(postDataObject.groupName ),
                     await database.getTeacherIDByLogin(postDataObject.teacherLogin),
                     postDataObject.date
                 );

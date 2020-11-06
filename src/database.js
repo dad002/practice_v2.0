@@ -457,8 +457,28 @@ function getGroupsByTeacher(login) {
     });
 }
 
+function getGroupsByStudent(login) {
+    return new Promise((resolve, reject) => {
+
+        let sql = 'SELECT Class.Number, Class.ID FROM Class JOIN Student ON Student.GroupID = Class.ID WHERE Student.Login = (?)';
+        let res = [];
+
+        db.all(sql, [login], (err, rows) => {
+            if (err) {
+                console.log(err.message);
+                resolve(res);
+            }
+
+            rows.forEach(row => {
+                res.push(row);
+            });
+
+            resolve(res);
+        });
+    });
+}
+
 function getGroupIDbyNumber(number) {
-    console.log(number);
     return new Promise((resolve, reject) => {
         let sql = "SELECT ID FROM Class WHERE Number = (?)";
 
@@ -683,6 +703,7 @@ module.exports = {
     addAtt,
     getStudentsByGroup,
     getGroupsByTeacher,
+    getGroupsByStudent,
     getStudentIDByLogin,
     getAllStudents,
     setLink,
